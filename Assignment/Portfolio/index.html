@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+      <script>
+        document.getElementById("theme-toggle").addEventListener("change", function() {
+  if (this.checked) {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+});
+
+      </script>
+  </head>
+  <body>
+
+    <!-- -------------------Nav Start----------------------->
+    <nav>
+      <div class="logo-container">
+        <img class="logo" src="/assets/p-image1.png" alt="Logo" />
+        <h1 class="name">MOHD Naseemuddin</h1>
+      </div>
+
+      <div class="menu">
+        <a href="#">Home</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="#certificates">Certificates</a>
+      </div>
+
+      <div class="toggle-container">
+        <!-- Night/Day mode toggle -->
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="slider"></span>
+        </label>
+
+        <!-- Hamburger menu toggle -->
+        <div class="toggle">
+          <i class="fas fa-bars"></i>
+        </div>
+      </div>
+    </nav>
+    <!-- -------------------Nav End------------------------->
+
+    <!-- -------------------Header Start--------------------->
+    <header class="header">
+      <div class="container">
+        <h1>Hello, I'm Naseemuddin</h1>
+        <p>Your go-to cloud and web application developer, passionate about creating impactful digital solutions.</p>
+      
+        
+          <div class="links">
+          <a href="https://github.com/naseem173"
+            ><i class="fa-brands fa-github"></i
+          ></a>
+
+          <a href="https://www.linkedin.com/in/mohd-naseem-uddin-115509302/"
+            ><i class="fa-brands fa-linkedin"></i
+          ></a>
+
+          <a
+            href="mailto:md.naseem0978@gmail.com?subject=Inquiry&body=Hello, I have a query..."
+            ><i class="fa-solid fa-envelope"></i
+          ></a>
+
+          <a href="https://x.com/naseem0978"
+            ><i class="fa-brands fa-x-twitter"></i
+          ></a>
+        </div>
+        <a href="/assets/resume.pdf" download="resume.pdf" class="download-btn">
+  Resume <i class="fa-solid fa-download"></i>
+</a>
+  
+      </div>
+     
+      
+      <!-- profile  start-->
+
+      <div class="profile">
+  <!-- Original image -->
+  <img src="/assets/p-image1.png" alt="Profile Image" class="profile-img" id="img1" />
+  
+  <!-- Hover image -->
+  <img src="/assets/p-image3.jpg" height="500" width="500" alt="Profile Image on Hover" class="profile-img" id="img2" />
+</div>
+
+      <!-- profile  end-->
+
+
+    </header>
+    <!-- -------------------Header End----------------------->
+
+    <!-- -------------------Article Start-------------------->
+    <hr>
+    <article id="about">
+
+        <h1>About Me</h1>
+      <div class="about">
+        <div class="p-img">
+          <img src="assets/p-image2.jpg" alt="Profile picture">
+
+        </div>
+        <div class="content">
+          <h1 >MOHD Naseemuddin</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur assumenda atque possimus veritatis, sequi recusandae aperiam in accusantium amet magni ullam hic quos, repudiandae quae nobis dolor iste? Aut, magnam!</p>
+          <a href="https://www.linkedin.com/in/mohd-naseem-uddin-115509302/"  class="read-btn">
+
+          
+  Read more  
+</a>
+      </div>
+    </article>
+    <hr>
+    <!-- -------------------Article End----------------------->
+
+    <!-- -------------------Section Start-------------------->
+    <section id="skills">
+     <div  class="skills-section" id="skills">
+  <h2 class="skills-section__title">My Skills</h2>
+
+  <div class="skills-section__list">
+    <div class="skill skill--html">
+      <p class="skill__name">HTML</p>
+      <div class="skill__progress-bar">
+        <div class="skill__progress" style="width: 90%;"></div>
+      </div>
+    </div>
+
+    <div class="skill skill--css">
+      <p class="skill__name">CSS</p>
+      <div class="skill__progress-bar">
+        <div class="skill__progress" style="width: 85%;"></div>
+      </div>
+    </div>
+
+    <div class="skill skill--js">
+      <p class="skill__name">JavaScript</p>
+      <div class="skill__progress-bar">
+        <div class="skill__progress" style="width: 80%;"></div>
+      </div>
+    </div>
+
+    <div class="skill skill--react">
+      <p class="skill__name">React</p>
+      <div class="skill__progress-bar">
+        <div class="skill__progress" style="width: 75%;"></div>
+      </div>
+    </div>
+
+    <div class="skill skill--mongodb">
+      <p class="skill__name">MongoDB</p>
+      <div class="skill__progress-bar">
+        <div class="skill__progress" style="width: 70%;"></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- skill-banner -->
+  <div class="skills-banner" id="skills-banner">
+    
+  <div class="skills-banner__track">
+    <img src="assets/html-logo.png" alt="HTML Logo" class="skills-banner__logo" />
+    <img src="assets/css-logo.png" alt="CSS Logo" class="skills-banner__logo" />
+    <img src="assets/js-logo.png" alt="JavaScript Logo" class="skills-banner__logo" />
+    <img src="assets/react-logo.png" alt="React Logo" class="skills-banner__logo" />
+    <img src="assets/mongodb-logo.png" alt="MongoDB Logo" class="skills-banner__logo" />
+    <!-- Repeat logos for seamless effect -->
+    <img src="assets/html-logo.png" alt="HTML Logo" class="skills-banner__logo" />
+    <img src="assets/css-logo.png" alt="CSS Logo" class="skills-banner__logo" />
+    <img src="assets/js-logo.png" alt="JavaScript Logo" class="skills-banner__logo" />
+    <img src="assets/react-logo.png" alt="React Logo" class="skills-banner__logo" />
+    <img src="assets/mongodb-logo.png" alt="MongoDB Logo" class="skills-banner__logo" />
+  </div>
+  </div>
+</section>
+<hr>
+
+<section id="projects">
+  <div class="projects">
+    <div class="cards">
+        <div class="project-card">
+    <img src="/assets/project-image1.jpg" alt="Project 1" class="project-image">
+    <h3 class="project-title">AI-Agent Project</h3>
+    <p class="project-description">The AI-Agent is a cutting-edge system designed to automate various tasks and assist users through intelligent interactions. L</p>
+    <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+  </div>
+  
+  <div class="project-card">
+    <img src="/assets/project-image2.jpg" alt="Project 2" class="project-image">
+    <h3 class="project-title">To-Do List app</h3>
+    <p class="project-description">Short description of the project goes here.</p>
+    <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+    
+  </div>
+
+   <div class="project-card">
+    <img src="/assets/project-image3.jpg" alt="Project 3" class="project-image">
+    <h3 class="project-title">Stack-overflow-clone</h3>
+    <p class="project-description">he Stack Overflow Clone is a web application that replicates the functionality of Stack Overflow, a popular Q&A platform for developers.</p>
+        <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+ </div>
+
+   <div class="project-card">
+    <img src="/assets/project-image4.jpg" alt="Project 4" class="project-image">
+    <h3 class="project-title">Twitter</h3>
+    <p class="project-description">Twitter is a social media platform that enables users to post and interact with short messages called "tweets." </p>
+        <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+</div>
+   <div class="project-card">
+    <img src="/assets/project-image5.jpg" alt="Project 5" class="project-image">
+    <h3 class="project-title">React-blog</h3>
+    <p class="project-description">The React Blog is a web application built using React.js that allows users to create, read, edit, and delete blog posts.</p>
+ 
+    <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+  </div>
+   <div class="project-card">
+    <img src="/assets/project-image6.jpg" alt="Project 6" class="project-image">
+    <h3 class="project-title">Youtube-clone</h3>
+    <p class="project-description">YouTube is a video-sharing platform where users can upload, view, and interact with videos. </p>
+       <a href="https://github.com/naseem173/" target="_blank" class="project-link">View Project</a>
+</div>
+
+  
+    </div>
+  </div>
+</section>
+<hr>
+<!-- certificates -->
+<section id="certificates">
+
+  <h1>Certificates</h1>
+  <div class="certificate-slider">
+  <input type="radio" name="slider" id="slide1" checked>
+  <input type="radio" name="slider" id="slide2">
+  <input type="radio" name="slider" id="slide3">
+
+  <div class="slider-container">
+    <div class="certificate-slide">
+      <img src="/assets/AI.png" alt="Certificate 1" class="certificate-image">
+      <h3 class="certificate-title">UI/UX</h3>
+      <p class="certificate-description">UI/UX (User Interface / User Experience) Design refers to the process of creating visually appealing and user-friendly digital products. </p>
+    </div>
+
+    <div class="certificate-slide">
+      <img src="/assets/Screenshot from 2025-01-16 23-34-23.png" alt="Certificate 2" class="certificate-image">
+      <h3 class="certificate-title">Cloud Application Developer Certification</h3>
+      <p class="certificate-description">Successfully completed the Cloud Application Developer program through NSDC.</p>
+    </div>
+
+    <div class="certificate-slide">
+      <img src="assets/AI.png" alt="Certificate 3" class="certificate-image">
+      <h3 class="certificate-title">Data Science Certification</h3>
+      <p class="certificate-description">Completed a Data Science course with hands-on projects.</p>
+    </div>
+  </div>
+
+  <div class="slider-controls">
+    <label for="slide1" class="slider-dot"></label>
+    <label for="slide2" class="slider-dot"></label>
+    <label for="slide3" class="slider-dot"></label>
+  </div>
+</div>
+
+</section>
+
+<hr>
+
+<section>
+   <div id="contact">
+        <h1>Contact Me</h1>
+        <form action="/" method="POST">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required /><br /><br />
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required /><br /><br />
+
+          <label for="message">Message:</label><br />
+          <textarea id="message" name="message" required></textarea><br /><br />
+
+          <button type="submit">Submit</button>
+        </form>
+        <div class="links">
+          <a href="https://github.com/naseem173"
+            ><i class="fa-brands fa-github"></i
+          ></a>
+
+          <a href="https://www.linkedin.com/in/mohd-naseem-uddin-115509302/"
+            ><i class="fa-brands fa-linkedin"></i
+          ></a>
+
+          <a
+            href="mailto:md.naseem0978@gmail.com?subject=Inquiry&body=Hello, I have a query..."
+            ><i class="fa-solid fa-envelope"></i
+          ></a>
+        </div>
+      </section>
+
+     
+
+      <!--------------Section End---------------->
+
+      <!--------------Footer Start---------------->
+
+      <footer>
+        <p>&copy; 2025 MOHD Naseemuddin. All rights reserved.</p>
+      </footer>
+</section>
+
+    <!-- -------------------Section End----------------------->
+
+  </body>
+</html>
