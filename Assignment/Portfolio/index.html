@@ -14,6 +14,7 @@
     
   </head>
   <body>
+   
 
     <!-- -------------------Nav Start----------------------->
     <nav>
@@ -33,15 +34,21 @@
 
       <div class="toggle-container">
         <!-- Night/Day mode toggle -->
-        <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle" />
-          <span class="slider"></span>
-        </label>
+      
 
         <!-- Hamburger menu toggle -->
         <div class="toggle">
-          <i class="fas fa-bars"></i>
-        </div>
+ <div class="nav2" id="nav2">
+  <select onchange="window.location.href=this.value;">
+            <option value="#">Home</option>
+            <option value="#about">About</option>
+            <option value="#skills">Skills</option>
+            <option value="#projects">Projects</option>
+            <option value="#about">About</option>
+            <option value="#contact">Contact</option>
+            <option value="#certificates">Certificates</option>
+          </select>
+       
       </div>
     </nav>
     <!-- -------------------Nav End------------------------->
@@ -98,18 +105,24 @@
     <!-- -------------------Header End----------------------->
 
     <!-- -------------------Article Start-------------------->
-    <hr id="about">
-    <article>
+    <hr>
       <!-- //practise -->
-        <h1>About Me!</h1>
+       
+    <article>
 
+      
+      <div id="about" class="box0">
 
-      <div class="about">
-        <div class="p-img">
-          <img src="assets/p-image2.jpg" alt="Profile picture">
+        <div class="box1">
+           <h1>About Me!</h1>
 
         </div>
-        <div class="content">
+        <div class="box2">
+          <img src="assets/p-image2.jpg" alt="Profile picture">
+      </div>
+
+       
+        <div class="box3">
 
           <h1 >MOHD Naseemuddin</h1>
           <p>Passionate about building and optimizing cloud-based and web applications, with a strong foundation in web development and cloud technologies. Certified AWS Cloud Practitioner with expertise in AWS cloud services, architecture, and security best practices. Additionally certified by NSDC as a Cloud Application Developer, skilled in designing and deploying scalable, resilient cloud solutions. Experienced in developing modern, user-centric web applications and committed to delivering seamless, efficient digital solutions tailored to enterprise needs.</p>
@@ -120,11 +133,14 @@
   Read more...  
 </a>
       </div>
+       </div>
     </article>
     <hr>
     <!-- -------------------Article End----------------------->
 
     <!-- -------------------Section Start-------------------->
+
+    
     <section id="skills">
      <div  class="skills-section" >
   <h1 class="skills-section__title">My Skills</h1>
@@ -195,27 +211,31 @@
 <section id="projects">
   <div class="projects">
     <h1>Projects</h1>
+
+    
     <div class="cards">
         <div class="project-card">
           <a href="https://github.com/naseem173/" target="_blank" class="project-link">
     <img src="/assets/project-image1.jpg" alt="Project 1" class="project-image">
     <h3 class="project-title">AI-Agent Project</h3>
-    <p class="project-description">The AI-Agent is a cutting-edge system designed to automate various tasks and assist users through intelligent interactions. L</p>
+    <p class="project-description">The AI-Agent is a cutting-edge system designed
+       to automate various tasks and assist users through intelligent interactions. L</p>
     </a>
+    
   </div>
   
   <div class="project-card">
     <a href="https://github.com/naseem173/" target="_blank" class="project-link">
     <img src="/assets/project-image2.jpg" alt="Project 2" class="project-image">
     <h3 class="project-title">To-Do List app</h3>
-    <p class="project-description">Short description of the project goes here.</p>
+    <p class="project-description">A To-Do List App is a simple yet powerful productivity tool that helps users organize and manage their tasks efficiently. It allows users to create, update, and track their tasks, ensuring they stay on top of their daily responsibilities.</p>
     </a>
   </div>
 
    <div class="project-card">
     <a href="https://github.com/naseem173/" target="_blank" class="project-link">
     <img src="/assets/project-image3.jpg" alt="Project 3" class="project-image">
-    <h3 class="project-title">Stack-overflow-clone</h3>
+    <h3 class="project-title">Stack-overflow</h3>
     <p class="project-description">he Stack Overflow Clone is a web application that replicates the functionality of Stack Overflow, a popular Q&A platform for developers.</p>
         </a>
  </div>
@@ -242,48 +262,37 @@
        </a>
 </div>
 
+
   
     </div>
+    <div class="arrows1">
+    <button id="prev2" class="prev"><</button>
+    <button id="next2" class="next">></button>
+  </div>
   </div>
 </section>
 <hr>
-<!-- certificates -->
+
+<!-- certificates  -->
 <section id="certificates">
 
-  <h1>Certificates</h1>
-  <div class="certificate-slider">
-  <input type="radio" name="slider" id="slide1" checked>
-  <input type="radio" name="slider" id="slide2">
-  <input type="radio" name="slider" id="slide3">
-
-  <div class="slider-container">
-    <div class="certificate-slide">
-      <img src="/assets/AI.png" alt="Certificate 1" class="certificate-image">
-      <h3 class="certificate-title">UI/UX</h3>
-      <p class="certificate-description">UI/UX (User Interface / User Experience) Design refers to the process of creating visually appealing and user-friendly digital products. </p>
-    </div>
-
-    <div class="certificate-slide">
-      <img src="/assets/Screenshot from 2025-01-16 23-34-23.png" alt="Certificate 2" class="certificate-image">
-      <h3 class="certificate-title">Cloud Application Developer Certification</h3>
-      <p class="certificate-description">Successfully completed the Cloud Application Developer program through NSDC.</p>
-    </div>
-
-    <div class="certificate-slide">
-      <img src="assets/AI.png" alt="Certificate 3" class="certificate-image">
-      <h3 class="certificate-title">Data Science Certification</h3>
-      <p class="certificate-description">Completed a Data Science course with hands-on projects.</p>
-    </div>
+<div class="banner">
+  <div class="sliders">
+    <img src="assets/AI.png"  alt="ai">
+    <img src="assets/Cpp.png"  alt="cpp">
+    <img src="assets/TCS.png" alt="tcs">
+     <img src="assets/AI.png"  alt="ai">
+    <img src="assets/Cpp.png"  alt="cpp">
+    <img src="assets/TCS.png" alt="tcs">
   </div>
-
-  <div class="slider-controls">
-    <label for="slide1" class="slider-dot"></label>
-    <label for="slide2" class="slider-dot"></label>
-    <label for="slide3" class="slider-dot"></label>
+  <div class="arrows">
+    <button id="prev" class="prev"><</button>
+    <button id="next" class="next">></button>
   </div>
 </div>
 
 </section>
+
 
 <hr>
 
@@ -307,10 +316,17 @@
             ><i class="fa-brands fa-github"></i
           ></a>
 
+
+
+
           <a href="https://www.linkedin.com/in/mohd-naseem-uddin-115509302/"
             ><i class="fa-brands fa-linkedin"></i
           ></a>
 
+
+
+
+          
           <a
             href="mailto:md.naseem0978@gmail.com?subject=Inquiry&body=Hello, I have a query..."
             ><i class="fa-solid fa-envelope"></i
@@ -330,6 +346,7 @@
 </section>
 
     <!-- -------------------Section End----------------------->
-
+ <script src="/index.js"></script>
   </body>
+ 
 </html>
