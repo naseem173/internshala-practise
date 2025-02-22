@@ -46,7 +46,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  height: 100px;
+  height: 70px;
   position: fixed;
   top: 0;
   width: 100%;
@@ -378,13 +378,22 @@ article {
   width: 100%;
   background: linear-gradient(to right, #4a47ff, #ffd700);
   color: #fff;
-  padding: 20px;
+  padding: 30px 20px;
 }
 
 .box0 {
   align-items: center;
-  border: 1px solid black;
-  background-color: #162e4d;
+  background-color: transparent;
+  -webkit-backdrop-filter: blur(20px);
+
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(0, 0, 343, 0.2)
+  );
+  background-size: 50px;
+  backdrop-filter: blur(20px);
+  box-shadow: 20px 20px 20px #8a7d7d;
   border-radius: 50px;
   display: grid;
   grid-template-columns: auto auto auto;
@@ -454,14 +463,23 @@ article {
 section {
   background: linear-gradient(to right, #4a47ff, #ffd700);
   height: 100vh;
-  padding: 60px 10px;
+  padding: 30px 20px;
 }
 
 /* Skills Section Styling */
 .skills-section,
 .projects {
   padding: 50px 20px;
-  background-color: #162e4d;
+  -webkit-backdrop-filter: blur(20px);
+  background-color: transparent;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(0, 0, 0, 0.2)
+  );
+  background-size: 50px;
+  backdrop-filter: blur(20px);
+  box-shadow: 20px 20px 20px #8a7d7d;
   color: wheat;
   text-align: center;
   border-radius: 50px;
@@ -532,7 +550,7 @@ section {
 .skills-banner {
   width: 100%;
   overflow: hidden;
-  background-color: #162e4d;
+  background-color: transparent;
   white-space: nowrap;
   padding: 20px 0;
   border-radius: 20px;
@@ -565,10 +583,10 @@ section {
 /* Keyframe Animation for Scrolling Effect */
 @keyframes scroll {
   0% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(0%);
   }
 }
 
@@ -732,14 +750,20 @@ section {
   animation: scrollAnimation 15s linear infinite;
 }
 .sliders:hover {
-  animation-play-state: paused; /* Pauses animation on hover */
+  animation-play-state: paused;
+  /* Pauses animation on hover */
 }
 
 .sliders img {
   height: 80vh; /* Adjust size */
   width: auto;
   object-fit: cover;
-  clip-path: inset(0 120px 0 120px);
+  clip-path: inset(0 130px 0 130px);
+}
+
+.sliders img:hover {
+  transform: scaleX(1.15) scaleY(1.1); /* Slightly expand the progress bar on hover */
+  transition: transform 0.3s ease-in-out;
 }
 @media screen and (max-width: 1100px) {
   .sliders img {
@@ -791,10 +815,18 @@ section {
 
 /* Contact Section */
 #contact {
-  background-color: #132e4b;
+  background-color: transparent;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(0, 0, 0, 0.2)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  box-shadow: 20px 20px 20px #8a7d7d;
   padding: 20px 300px;
   border-radius: 50px;
-  box-shadow: 0 4px 10px var(--shadow-color);
 }
 @media screen and (max-width: 768px) {
   #contact {
@@ -929,5 +961,24 @@ footer {
   body {
     margin: 0;
     flex-wrap: wrap;
+  }
+}
+
+.spider {
+  position: relative;
+}
+.spider #dotCanvas {
+  position: absolute;
+  background-color: transparent;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 1000px) {
+  #dotCanvas {
+    display: none;
   }
 }
