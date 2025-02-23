@@ -41,6 +41,10 @@ body {
 /* Navbar Styling */
 nav {
   background-color: var(--nav-bg);
+
+  transition: transform 1s ease-out;
+
+
   opacity: 90%;
   display: flex;
   justify-content: space-between;
@@ -53,7 +57,7 @@ nav {
   margin-bottom: 20px;
   z-index: 1000;
   transition: background-color 0.3s ease;
-  box-shadow: 20px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 10px 10px 10px rgba(222, 209, 209, 0.1)1);
 }
 
 @media screen and (max-width: 768px) {
@@ -393,7 +397,7 @@ article {
   );
   background-size: 50px;
   backdrop-filter: blur(20px);
-  box-shadow: 20px 20px 20px #8a7d7d;
+  box-shadow: 10px 10px 10px #8a7d7d;
   border-radius: 50px;
   display: grid;
   grid-template-columns: auto auto auto;
@@ -479,7 +483,7 @@ section {
   );
   background-size: 50px;
   backdrop-filter: blur(20px);
-  box-shadow: 20px 20px 20px #8a7d7d;
+  box-shadow: 10px 10px 10px #8a7d7d;
   color: wheat;
   text-align: center;
   border-radius: 50px;
@@ -655,7 +659,7 @@ section {
     border-radius: 8px;
     width: 250px; /* 4 cards at a time (desktop) */
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
   }
 
@@ -824,7 +828,7 @@ section {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 
-  box-shadow: 20px 20px 20px #8a7d7d;
+  box-shadow: 10px 10px 10px #8a7d7d;
   padding: 20px 300px;
   border-radius: 50px;
 }
