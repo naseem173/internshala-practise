@@ -326,9 +326,35 @@ article h1 {
 .profile {
   position: relative;
   display: inline-block;
+  transform: rotate(10deg);
   width: 500px; /* Adjust according to your image size */
   height: 500px; /* Adjust according to your image size */
   margin-top: 20px;
+  transition: transform 1s ease-in-out;
+}
+.profile:hover{
+  transform: rotate(0deg);
+  animation:photo-swing 3s ease-out;
+}
+
+@keyframes photo-swing{
+  0%{
+    transform: rotate(10deg);
+  }
+  50%{
+    transform: rotate(-20deg);
+  }
+  75%{
+    transform: rotate(10deg);
+
+  }
+  90%{
+    transform: rotate(-5deg);
+
+  }
+  100%{
+    transform: rotate(0deg);
+  }
 }
 
 .profile img {
@@ -608,7 +634,7 @@ section {
 
 /* Projects Section */
 #projects {
-  padding: 20px;
+  padding: 30px 20px;
   background-color: #f9f9f9;
 }
 
@@ -852,6 +878,8 @@ section {
   );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  background-size: 50px;
+
 
   box-shadow: 10px 10px 10px #8a7d7d;
   padding: 20px 300px;
