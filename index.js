@@ -59,98 +59,70 @@
 
 
 
-//spider
+//spider Effect
   
 
-let spider = document.querySelector(".spider");
-let canvas = document.getElementById("dotCanvas");
+const spider = document.querySelector(".spider");
+const canvas = document.getElementById("dotCanvas");
+const ctx = canvas.getContext("2d");
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
-let ctx = canvas.getContext("2d");
-let dots = [];
+const dots = Array.from({ length: 100 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  size: Math.random() * 2 + 3,
+  color: ["#eee", "#545454", "#596d91", "#bb5a68", "#696969"][
+    Math.floor(Math.random() * 5)
+  ],
+}));
 
-let arrayColors = ["#eee", "#545454", "#596d91", "#bb5a68", "#696969"];
-
-for (let index = 0; index < 100; index++) {
-  dots.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    size: Math.random() * 2 + 2,
-    color: arrayColors[Math.floor(Math.random() * arrayColors.length)],
-  });
-}
-
-// Function to draw dots
 const drawDots = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  dots.forEach((dot) => {
-    ctx.fillStyle = dot.color;
+  dots.forEach(({ x, y, size, color }) => {
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+    ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
   });
 };
 
-// Function to draw web-like connections
 const drawConnections = (mouse = null) => {
-  for (let i = 0; i < dots.length; i++) {
-    for (let j = i + 1; j < dots.length; j++) {
-      let dx = dots[i].x - dots[j].x;
-      let dy = dots[i].y - dots[j].y;
-      let distance = Math.sqrt(dx * dx + dy * dy);
-
+  dots.forEach((d1, i) => {
+    dots.slice(i + 1).forEach((d2) => {
+      const distance = Math.hypot(d1.x - d2.x, d1.y - d2.y);
       if (distance < 100) {
-        // Adjust for web density
-        ctx.strokeStyle =  dots[i].color;
+        ctx.strokeStyle = d1.color;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(dots[i].x, dots[i].y);
-        ctx.lineTo(dots[j].x, dots[j].y);
-        ctx.stroke();
-      }
-    }
-  }
-
-  if (mouse) {
-    dots.forEach((dot) => {
-      let dx = mouse.x - dot.x;
-      let dy = mouse.y - dot.y;
-      let distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < 250) {
-        ctx.strokeStyle = dot.color;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(dot.x, dot.y);
-        ctx.lineTo(mouse.x, mouse.y);
+        ctx.moveTo(d1.x, d1.y);
+        ctx.lineTo(d2.x, d2.y);
         ctx.stroke();
       }
     });
-  }
+
+    if (mouse && Math.hypot(mouse.x - d1.x, mouse.y - d1.y) < 250) {
+      ctx.strokeStyle = d1.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(d1.x, d1.y);
+      ctx.lineTo(mouse.x, mouse.y);
+      ctx.stroke();
+    }
+  });
 };
 
-// Initial draw
-drawDots();
-drawConnections();
-
-spider.addEventListener("mousemove", (event) => {
-  let mouse = {
-    x: event.pageX - spider.getBoundingClientRect().left,
-    y: event.pageY - spider.getBoundingClientRect().top,
-  };
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+const updateCanvas = (mouse = null) => {
   drawDots();
   drawConnections(mouse);
+};
+updateCanvas();
+
+spider.addEventListener("mousemove", ({ pageX, pageY }) => {
+  updateCanvas({ x: pageX - spider.offsetLeft, y: pageY - spider.offsetTop });
 });
 
-spider.addEventListener("mouseout", () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawDots();
-  drawConnections();
-});
-
+spider.addEventListener("mouseout", () => updateCanvas());
 
 //nav bar
 
