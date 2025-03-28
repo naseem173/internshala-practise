@@ -162,6 +162,13 @@ nav {
   color: transparent;
 }
 
+/* button*/
+
+.nav2 button{
+  background-color: transparent;
+  border: none;
+}
+
 /* Typewriter */
 
 .typewriter {

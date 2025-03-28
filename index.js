@@ -130,9 +130,79 @@ window.addEventListener("scroll", function () {
   const navbar = document.querySelector("nav");
   const halfway = window.innerHeight *2; // Half of the viewport height
 
-  if (window.scrollY > halfway) {
+  if (window.scrollY > halfway && window.innerWidth > 400) {
     navbar.style.transform = "translateY(-100%)"; // Move navbar out of view
   } else {
     navbar.style.transform = "translateY(0)"; // Bring navbar back
   }
 });
+
+//menu
+
+
+
+function menu(onClick) {
+  let button = document.getElementById("ul");
+  button.style.display = "none";
+
+  let cross = document.createElement("i");
+  cross.className = "fa-solid fa-xmark";
+  cross.style.cursor = "pointer";
+
+
+  let menuItem = document.createElement("ul");
+
+  menuItem.style.position = "fixed";
+  menuItem.style.top = "60px";
+  menuItem.style.right = "60px";
+  menuItem.style.listStyle = "none";
+  menuItem.style.background =
+    "linear-gradient(to bottom, #4a47ff, #ffd700)";
+  menuItem.style.zIndex = "2000";
+  menuItem.style.borderRadius = "5px";
+
+let items = [
+  { name: "Home", link: "#" },
+  { name: "About", link: "#about" },
+  { name: "Skills", link: "#skills" },
+  { name: "Projects", link: "#projects" },
+  { name: "Contact", link: "#contact" },
+  { name: "Certificates", link: "#certificates" },
+];
+
+  items.forEach((text) => {
+    let li = document.createElement("li");
+    let a = document.createElement("a");
+    a.textContent = text.name;
+    a.href = text.link;
+    a.style.textDecoration = "none";
+    a.style.color = "black";
+    a.style.display = "block";
+    a.style.padding = "5px";
+
+    li.appendChild(a);
+    menuItem.appendChild(li);
+
+    a.addEventListener("click", () => {
+      button.style.display = "block";
+      cross.remove();
+      menuItem.remove();
+    });
+  });
+
+  document.body.appendChild(menuItem);
+
+  //append
+
+  document.querySelector(".nav2").appendChild(cross);
+  document.querySelector(".nav2").appendChild(menuItem);
+
+  cross.addEventListener("click", () => {
+    button.style.display = "block";
+    cross.remove();
+    menuItem.remove();
+  });
+
+
+}
+
