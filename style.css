@@ -50,7 +50,7 @@ nav {
     rgba(255, 255, 255, 0.3),
     rgba(0, 0, 343, 0.2)
   );
-  backdrop-filter: blur(2040px);
+  backdrop-filter: blur(20px);
   box-shadow: 10px 10px 10px #8a7d7d;
   border-bottom-right-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -371,7 +371,17 @@ article {
   width: 100%;
   background: linear-gradient(to right, #4a47ff, #ffd700);
   color: #fff;
-  padding: 30px 20px;
+  padding: 100px 20px 30px;
+}
+
+/* Prevent the fixed navbar from covering section headings when
+   jumping to a section via the nav links */
+#about,
+#skills,
+#projects,
+#certificates,
+#contact {
+  scroll-margin-top: 100px;
 }
 
 .box0 {
@@ -407,7 +417,7 @@ article {
       "para para para";
   }
   article {
-    padding: 30px 10px;
+    padding: 100px 10px 30px;
   }
 }
 
@@ -456,7 +466,7 @@ article {
 section {
   background: linear-gradient(to right, #4a47ff, #ffd700);
   height: 100vh;
-  padding: 30px 20px;
+  padding: 70px 20px 30px;
 }
 
 /* Skills Section Styling */
@@ -587,7 +597,7 @@ section {
 
 /* Projects Section */
 #projects {
-  padding: 30px 20px;
+  padding: 70px 20px 30px;
   background-color: #f9f9f9;
 }
 
@@ -621,47 +631,54 @@ section {
   flex: 0 0 auto;
 }
 
-@media screen and (max-width: 500px) {
-#projects{
-  padding: 30px 10px;
+/* Responsive project cards: a single, consistent breakpoint strategy
+   instead of three overlapping/conflicting rules that previously
+   forced fixed 450px columns wider than the tablet/mobile viewport. */
+.arrows1 {
+  display: none;
+  margin-top: 20px;
+  justify-content: space-around;
+}
+.arrows1 > button {
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  border: none;
+  color: rgb(236, 223, 223);
+  font-size: 2rem;
+  cursor: pointer;
+  height: 60px; /* Adjust button size */
+  width: 60px; /* Adjust button size */
+  border-radius: 50%; /* Circular buttons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
 }
 
-  .cards{
-    margin-left: 15%;
-  }
-
-  .project-card {
-    display: none;
-    width: 100%;
-     /* Hide all project cards by default */
-  }
-
-  .project-card:first-child {
-    display: inline; /* Show only the first project card */
-    overflow: hidden;
-
-  }
-
-  section{
-    padding: 30px 10px;
-  }
+.arrows1 button:hover {
+  background: rgba(0, 0, 0, 0.8); /* Darker on hover */
 }
-@media screen and (max-width: 786px) {
+
+@media screen and (max-width: 900px) {
+  #projects {
+    padding: 70px 10px 30px;
+  }
+
   .cards {
     display: grid;
-    grid-template-columns: 450px 450px;
-    gap: 0px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
     padding: 10px;
-
-    grid-template-rows: auto;
     overflow: hidden;
-    justify-content: space-around;
+    justify-content: center;
   }
+
   .project-card {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    width: 250px; /* 4 cards at a time (desktop) */
+    width: 100%;
+    max-width: 320px;
+    justify-self: center;
     text-align: center;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
@@ -673,36 +690,25 @@ section {
 
   .arrows1 {
     display: flex;
-    margin-top: 20px;
-    justify-content: space-around;
-  }
-  .arrows1 > button {
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    border: none;
-    color: rgb(236, 223, 223);
-    font-size: 2rem;
-    cursor: pointer;
-    height: 60px; /* Adjust button size */
-    width: 60px; /* Adjust button size */
-    border-radius: 50%; /* Circular buttons */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
   }
 
-  .arrows1 button:hover {
-    background: rgba(0, 0, 0, 0.8); /* Darker on hover */
+  section {
+    padding: 70px 10px 30px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card:nth-child(n + 2) {
+    display: none;
   }
 }
 
 .project-card:hover {
   transform: translateY(-5px);
-}
-@media screen and (min-width: 786px) {
-  .arrows1 {
-    display: none;
-  }
 }
 .project-image {
   width: 100%;
@@ -734,10 +740,10 @@ section {
   color: inherit;
 }
 
-@media screen and (max-width: 360px) {
-  .project-card {
-    width: 900px; /* 1 card at a time (mobile) */
-  }
+/* Certificates slider is a full-bleed banner with no heading to clear,
+   so it doesn't need the extra top padding added to `section` above. */
+#certificates {
+  padding: 30px 20px;
 }
 
 /* new certificates css */
@@ -960,10 +966,6 @@ footer {
   }
   .toggle {
     display: block;
-  }
-
-  .project-card {
-    width: 45%; /* Two cards per row */
   }
 }
 
