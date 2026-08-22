@@ -226,6 +226,28 @@
   .stamp .name{ font-family:'Fraunces'; font-weight:600; font-size:0.88rem; text-align:center; }
   .stamp .view-hint{ font-family:'Space Mono'; font-size:0.62rem; color:var(--ink-dim); text-align:center; }
 
+  /* -------- GITHUB ACTIVITY -------- */
+  .gh-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:24px; align-items:stretch; }
+  @media (max-width:900px){ .gh-grid{ grid-template-columns:1fr; } }
+  .gh-grid > *{ min-width:0; }
+  .gh-card{ background:var(--paper); border:1px solid var(--border); border-radius:10px; padding:26px 28px; box-shadow:var(--shadow-card); min-width:0; }
+  .gh-label{ font-family:'Space Mono'; font-size:0.68rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 18px; }
+  .gh-graph-card{ display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .gh-graph-scroll{ overflow-x:auto; width:100%; min-width:0; }
+  .gh-graph{ width:100%; min-width:640px; height:auto; display:block; }
+  .gh-link{ display:inline-block; margin-top:18px; font-family:'Space Mono'; font-size:0.78rem; color:var(--accent); text-decoration:none; }
+  .gh-link:hover{ text-decoration:underline; }
+  .gh-side{ display:flex; flex-direction:column; gap:24px; min-width:0; }
+  .gh-stat-row{ display:flex; gap:10px; flex-wrap:wrap; min-width:0; }
+  .gh-stat-row img{ height:28px; max-width:100%; }
+  .gh-badge-card{ display:flex; flex-direction:column; align-items:center; text-align:center; flex:1; justify-content:center; }
+  .gh-badge-icon{
+    width:82px; height:82px; border-radius:50%; border:2px dashed var(--border-strong);
+    display:flex; align-items:center; justify-content:center; font-size:2.3rem; background:var(--paper-tint);
+  }
+  .gh-badge-name{ font-family:'Fraunces'; font-weight:600; font-size:1rem; margin:12px 0 4px; }
+  .gh-badge-desc{ font-size:0.8rem; color:var(--ink-muted); max-width:26ch; margin:0; }
+
   /* -------- CERTIFICATE LIGHTBOX -------- */
   .lightbox{
     position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center;
@@ -284,6 +306,7 @@
     <li><a href="#skills">Skills</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#certificates">Certificates</a></li>
+    <li><a href="#github">GitHub</a></li>
   </ul>
   <a class="cta" href="#contact">Get in touch</a>
 </nav>
@@ -438,6 +461,41 @@
     <p class="lightbox-caption" id="lightboxCaption"></p>
   </div>
 </div>
+
+<section id="github">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><span class="dot"></span>Open Source</p>
+      <h2>Shipping in the open</h2>
+      <p>Live from GitHub — pulled in real time, not a screenshot.</p>
+    </div>
+    <div class="gh-grid">
+      <div class="gh-card gh-graph-card">
+        <p class="gh-label">Contribution activity</p>
+        <div class="gh-graph-scroll">
+          <img class="gh-graph" src="https://ghchart.rshah.org/2547e0/naseem173" alt="Mohd Naseemuddin's GitHub contribution graph" loading="lazy" width="826" height="112" />
+        </div>
+        <a class="gh-link" href="https://github.com/naseem173" target="_blank" rel="noopener">View live activity on GitHub →</a>
+      </div>
+      <div class="gh-side">
+        <div class="gh-card">
+          <p class="gh-label">Live stats</p>
+          <div class="gh-stat-row">
+            <img src="https://img.shields.io/badge/dynamic/json?url=https://api.github.com/users/naseem173&label=Public%20Repos&query=public_repos&color=2547e0&style=for-the-badge" alt="Public repositories count" loading="lazy" />
+            <img src="https://img.shields.io/badge/dynamic/json?url=https://api.github.com/users/naseem173&label=Followers&query=followers&color=2547e0&style=for-the-badge" alt="GitHub followers count" loading="lazy" />
+          </div>
+        </div>
+        <div class="gh-card gh-badge-card">
+          <p class="gh-label" style="align-self:flex-start;">Earned achievement</p>
+          <div class="gh-badge-icon">🦈</div>
+          <p class="gh-badge-name">Pull Shark</p>
+          <p class="gh-badge-desc">Awarded for merged pull requests across public repositories.</p>
+          <a class="gh-link" href="https://github.com/naseem173?tab=achievements" target="_blank" rel="noopener">View achievements →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="contact">
   <div class="wrap">
