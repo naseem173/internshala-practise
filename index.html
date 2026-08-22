@@ -248,6 +248,27 @@
   .gh-badge-name{ font-family:'Fraunces'; font-weight:600; font-size:1rem; margin:12px 0 4px; }
   .gh-badge-desc{ font-size:0.8rem; color:var(--ink-muted); max-width:26ch; margin:0; }
 
+  .gh-prs{ margin-top:28px; min-width:0; }
+  .gh-prs-label{ font-family:'Space Mono'; font-size:0.68rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 14px; }
+  .gh-pr-list{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .gh-pr-card{
+    display:flex; align-items:flex-start; gap:16px; background:var(--paper); border:1px solid var(--border);
+    border-radius:10px; padding:18px 22px; box-shadow:var(--shadow-card); min-width:0;
+  }
+  .gh-pr-status{
+    flex:0 0 auto; font-family:'Space Mono'; font-size:0.62rem; letter-spacing:0.05em; text-transform:uppercase;
+    padding:5px 10px; border-radius:999px; white-space:nowrap; margin-top:3px;
+  }
+  .gh-pr-status.merged{ background:rgba(37,71,224,0.1); color:var(--accent); }
+  .gh-pr-status.open{ background:rgba(226,71,43,0.1); color:var(--pin); }
+  .gh-pr-body{ flex:1; min-width:0; }
+  .gh-pr-repo{ font-family:'Space Mono'; font-size:0.72rem; color:var(--ink-dim); margin:0 0 4px; }
+  .gh-pr-title{ font-family:'Fraunces'; font-weight:600; font-size:1.02rem; margin:0 0 6px; }
+  .gh-pr-title a{ color:var(--ink); text-decoration:none; }
+  .gh-pr-title a:hover{ color:var(--accent); }
+  .gh-pr-desc{ font-size:0.86rem; color:var(--ink-muted); margin:0; line-height:1.5; }
+  @media (max-width:560px){ .gh-pr-card{ flex-direction:column; gap:8px; } }
+
   /* -------- CERTIFICATE LIGHTBOX -------- */
   .lightbox{
     position:fixed; inset:0; z-index:300; display:flex; align-items:center; justify-content:center;
@@ -491,6 +512,44 @@
           <p class="gh-badge-name">Pull Shark</p>
           <p class="gh-badge-desc">Awarded for merged pull requests across public repositories.</p>
           <a class="gh-link" href="https://github.com/naseem173?tab=achievements" target="_blank" rel="noopener">View achievements →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="gh-prs">
+      <p class="gh-prs-label">Open source pull requests</p>
+      <div class="gh-pr-list">
+        <div class="gh-pr-card">
+          <span class="gh-pr-status merged">Merged</span>
+          <div class="gh-pr-body">
+            <p class="gh-pr-repo">kmolan/multicalc-rust</p>
+            <p class="gh-pr-title"><a href="https://github.com/kmolan/multicalc-rust/pull/307" target="_blank" rel="noopener">Validate timestep &amp; rate in the attitude ODE integrator →</a></p>
+            <p class="gh-pr-desc">A non-finite rate or timestep could silently produce a NaN orientation in the ExponentialMap integrator. Added typed validation and tests; reviewed and merged by the maintainers.</p>
+          </div>
+        </div>
+        <div class="gh-pr-card">
+          <span class="gh-pr-status merged">Merged</span>
+          <div class="gh-pr-body">
+            <p class="gh-pr-repo">kmolan/multicalc-rust</p>
+            <p class="gh-pr-title"><a href="https://github.com/kmolan/multicalc-rust/pull/310" target="_blank" rel="noopener">Validate range and tolerance in polynomial root-finding →</a></p>
+            <p class="gh-pr-desc">Polynomial::real_roots_in could return silently wrong roots on a bad tolerance or a reversed range. Closed the gap with typed errors, merged same day.</p>
+          </div>
+        </div>
+        <div class="gh-pr-card">
+          <span class="gh-pr-status merged">Merged</span>
+          <div class="gh-pr-body">
+            <p class="gh-pr-repo">FreshCode-Org/freshdata</p>
+            <p class="gh-pr-title"><a href="https://github.com/FreshCode-Org/freshdata/pull/169" target="_blank" rel="noopener">Pandera interoperability recipe →</a></p>
+            <p class="gh-pr-desc">A runnable example showing how freshdata's cleaning pipeline complements pandera schema validation — merged into the project's official examples.</p>
+          </div>
+        </div>
+        <div class="gh-pr-card">
+          <span class="gh-pr-status open">In review</span>
+          <div class="gh-pr-body">
+            <p class="gh-pr-repo">pyjanitor-devs/pyjanitor</p>
+            <p class="gh-pr-title"><a href="https://github.com/pyjanitor-devs/pyjanitor/pull/1620" target="_blank" rel="noopener">New flag_in_range function →</a></p>
+            <p class="gh-pr-desc">Adding a range-flagging function to the pandas-janitor cleaning library, following the existing flag_nulls pattern, with full test coverage.</p>
+          </div>
         </div>
       </div>
     </div>
