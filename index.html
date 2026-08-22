@@ -193,6 +193,12 @@
   .pin-card .stack{ display:flex; gap:6px; flex-wrap:wrap; margin-top:16px; }
   .pin-card .stack span{ font-family:'Space Mono'; font-size:0.64rem; color:var(--ink-dim); border:1px solid var(--border); border-radius:4px; padding:3px 7px; }
   .pin-card .go{ margin-top:16px; font-family:'Space Mono'; font-size:0.78rem; color:var(--accent); }
+  .pin-card.not-live{ cursor:default; }
+  .pin-card.not-live:hover{ transform:none; box-shadow:var(--shadow-card); }
+  .pin-card.not-live::before{ background:#b8790a; box-shadow:0 3px 5px rgba(184,121,10,0.35); }
+  .pin-card.not-live .kicker .status-dot{ width:6px; height:6px; border-radius:50%; background:#b8790a; display:inline-block; margin-right:6px; }
+  .pin-card.not-live h3, .pin-card.not-live p{ opacity:0.78; }
+  .pin-card.not-live .go{ color:#b8790a; }
 
   /* -------- CERTIFICATES: STAMPS -------- */
   .stamps{ display:flex; gap:26px; flex-wrap:wrap; justify-content:center; }
@@ -362,27 +368,27 @@
         <div class="stack"><span>React</span><span>PostgreSQL</span><span>Python</span></div>
         <p class="go">naseem-data-portfolio.netlify.app →</p>
       </a>
-      <a class="pin-card pc2" href="https://github.com/naseem173/" target="_blank" rel="noopener">
-        <p class="kicker">AI / AUTOMATION</p>
-        <h3>AI‑Agent Project</h3>
-        <p>A system designed to automate multi‑step tasks and assist users through intelligent, tool‑using interactions.</p>
-        <div class="stack"><span>JavaScript</span><span>APIs</span></div>
-        <p class="go">View source →</p>
+      <a class="pin-card pc2" href="/ai-agent/" target="_blank" rel="noopener">
+        <p class="kicker">LIVE · AUTOMATION</p>
+        <h3>Waypoint — AI‑Agent Project</h3>
+        <p>A tool‑using task agent that plans and executes multi‑step requests — math, dates, unit conversion, text tools, JSON, and goal breakdowns — with a live reasoning trace.</p>
+        <div class="stack"><span>JavaScript</span><span>Parsing</span></div>
+        <p class="go">mohd-naseemuddin.netlify.app/ai-agent →</p>
       </a>
-      <a class="pin-card pc3" href="https://github.com/naseem173/" target="_blank" rel="noopener">
-        <p class="kicker">PRODUCTIVITY</p>
+      <div class="pin-card pc3 not-live">
+        <p class="kicker"><span class="status-dot"></span>PRODUCTIVITY</p>
         <h3>To‑Do List App</h3>
         <p>A focused productivity tool for creating, updating, and tracking daily tasks with a clean, distraction‑free UI.</p>
         <div class="stack"><span>JavaScript</span><span>HTML/CSS</span></div>
-        <p class="go">View source →</p>
-      </a>
-      <a class="pin-card pc4" href="https://github.com/naseem173/" target="_blank" rel="noopener">
-        <p class="kicker">Q&amp;A PLATFORM</p>
+        <p class="go">In progress — not live yet</p>
+      </div>
+      <div class="pin-card pc4 not-live">
+        <p class="kicker"><span class="status-dot"></span>Q&amp;A PLATFORM</p>
         <h3>Stack Overflow Clone</h3>
         <p>A web application replicating core Stack Overflow functionality — questions, answers, and voting for developers.</p>
         <div class="stack"><span>React</span><span>Node.js</span><span>MongoDB</span></div>
-        <p class="go">View source →</p>
-      </a>
+        <p class="go">In progress — not live yet</p>
+      </div>
     </div>
   </div>
 </section>
