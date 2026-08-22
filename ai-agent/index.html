@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Waypoint Agent</title>
-<meta name="description" content="Waypoint — a tool-using task agent that plans and executes multi-step requests: math, dates, units, text, JSON, and goal breakdowns.">
+<meta name="description" content="Waypoint — a tool-using agent backed by a real open-source AI model that runs entirely inside your browser, plus exact built-in tools for math, dates, units, text and JSON.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -27,6 +27,8 @@
     --obs-bg: rgba(79,214,160,0.10);
     --err: #ff6b6b;
     --err-bg: rgba(255,107,107,0.10);
+    --ai: #c792ff;
+    --ai-bg: rgba(199,146,255,0.10);
     --shadow: 0 2px 8px rgba(0,0,0,0.25), 0 20px 48px -20px rgba(0,0,0,0.6);
   }
   *{ box-sizing:border-box; }
@@ -48,12 +50,36 @@
 
   .app{ max-width:1180px; margin:0 auto; padding: 28px 24px 60px; min-height:100%; display:flex; flex-direction:column; }
 
-  header{ display:flex; align-items:center; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--border); margin-bottom:26px; flex-wrap:wrap; gap:12px; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--border); margin-bottom:22px; flex-wrap:wrap; gap:12px; }
   .brand{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem; letter-spacing:-0.01em; }
   .brand .mark{ color: var(--action); font-size:1.1rem; }
   .brand .sub{ font-family:'IBM Plex Mono'; font-weight:400; font-size:0.72rem; color:var(--text-faint); margin-left:6px; }
   .status{ font-family:'IBM Plex Mono'; font-size:0.76rem; color:var(--text-dim); display:flex; align-items:center; gap:8px; }
-  .status .status-dot{ width:7px; height:7px; border-radius:50%; background:var(--obs); box-shadow:0 0 0 3px rgba(79,214,160,0.18); }
+  .status .status-dot{ width:7px; height:7px; border-radius:50%; background:var(--obs); box-shadow:0 0 0 3px rgba(79,214,160,0.18); flex-shrink:0; }
+  .status.loading .status-dot{ background:var(--thought); box-shadow:0 0 0 3px rgba(242,184,75,0.18); animation:pulse 1s ease-in-out infinite; }
+  .status.error .status-dot{ background:var(--err); box-shadow:0 0 0 3px rgba(255,107,107,0.18); }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  .ai-banner{
+    background: var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; margin-bottom:16px; box-shadow: var(--shadow);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .ai-banner .txt{ flex:1; min-width:240px; font-size:0.86rem; color:var(--text-dim); }
+  .ai-banner .txt b{ color:var(--text); }
+  .ai-banner .btn-ai{
+    font-family:'Sora'; font-weight:600; font-size:0.86rem; color:#0d0f16; background: var(--ai);
+    border:none; border-radius:8px; padding:11px 20px; cursor:pointer; white-space:nowrap; transition:filter 0.15s ease;
+  }
+  .ai-banner .btn-ai:hover{ filter:brightness(1.1); }
+  .ai-banner .btn-ai:disabled{ opacity:0.5; cursor:default; }
+  .ai-banner.hidden{ display:none; }
+
+  .progress-wrap{ display:none; flex-direction:column; gap:6px; width:100%; }
+  .progress-wrap.show{ display:flex; }
+  .progress-track{ height:6px; border-radius:4px; background:var(--panel-raised); overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background: var(--ai); transition:width 0.2s ease; }
+  .progress-label{ font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--text-faint); }
 
   .layout{ display:grid; grid-template-columns: 1fr 300px; gap:28px; flex:1; align-items:start; }
   @media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
@@ -91,6 +117,11 @@
   .msg.observation .role .dot{ background: var(--obs); }
   .msg.observation .body{ font-family:'IBM Plex Mono'; font-size:0.86rem; background:var(--obs-bg); border-radius:6px; padding:10px 12px; white-space:pre-wrap; }
 
+  .msg.ai .role{ color: var(--ai); }
+  .msg.ai .role .dot{ background: var(--ai); }
+  .msg.ai .body{ font-family:'Sora'; font-size:0.92rem; background:var(--ai-bg); border-radius:6px; padding:10px 12px; white-space:pre-wrap; }
+  .msg.ai .body.streaming::after{ content:'▌'; opacity:0.6; animation:pulse 0.8s ease-in-out infinite; }
+
   .msg.error .role{ color: var(--err); }
   .msg.error .role .dot{ background: var(--err); }
   .msg.error .body{ background:var(--err-bg); border-radius:6px; padding:8px 10px; }
@@ -118,12 +149,14 @@
     border:1px solid var(--border); border-radius:999px; padding:6px 13px; cursor:pointer; transition: all 0.15s ease;
   }
   .chip:hover{ color:var(--text); border-color:var(--border-strong); background:var(--panel-alt); }
+  .chip.ai-chip{ border-color: rgba(199,146,255,0.3); }
 
   .tools-panel{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:18px; box-shadow:var(--shadow); }
   .tools-panel h2{ font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint); margin:0 0 14px; font-weight:600; }
   #toolList{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
   #toolList li{ display:flex; gap:10px; align-items:flex-start; }
   #toolList .tool-dot{ width:7px; height:7px; border-radius:50%; background:var(--action); margin-top:6px; flex-shrink:0; }
+  #toolList .tool-dot.ai-dot{ background:var(--ai); }
   #toolList .tool-name{ font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--text); font-weight:600; }
   #toolList .tool-desc{ font-size:0.78rem; color:var(--text-dim); margin-top:2px; }
 
@@ -135,14 +168,23 @@
 <div class="app">
   <header>
     <div class="brand"><span class="mark">◆</span> Waypoint<span class="sub">/ task agent</span></div>
-    <div class="status"><span class="status-dot"></span>Ready — 6 tools online</div>
+    <div class="status" id="statusEl"><span class="status-dot"></span><span id="statusText">Ready — 5 tools online</span></div>
   </header>
+
+  <div class="ai-banner" id="aiBanner">
+    <div class="txt">🧠 <b>Free-form chat needs the local AI model</b> — a real open-source model (Llama 3.2, ~880MB) downloaded once by your browser and cached after. Everything still runs on this page; nothing is sent to a server.</div>
+    <button class="btn-ai" id="enableAiBtn">Enable local AI</button>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Starting…</div>
+    </div>
+  </div>
 
   <div class="layout">
     <div class="console">
       <div class="trace" id="trace"></div>
       <form id="composer">
-        <input id="goalInput" type="text" placeholder="Give it a goal — e.g. “convert 12 miles to km”" autocomplete="off" />
+        <input id="goalInput" type="text" placeholder="Give it a goal — e.g. “convert 12 miles to km” or “why is the sky blue?”" autocomplete="off" />
         <button type="submit">Run →</button>
       </form>
       <div class="chips" id="chips"></div>
@@ -154,7 +196,7 @@
     </aside>
   </div>
 
-  <footer class="note">Everything here runs locally in your browser — no external API, no data leaves this page.</footer>
+  <footer class="note">Built-in tools run as plain code. Free-form chat runs a real AI model locally in your browser via WebGPU — no external API, no data leaves this page.</footer>
 </div>
 
 <script>
@@ -167,7 +209,6 @@
   --------------------------------------------------------- */
   function evalExpression(src){
     let i = 0;
-    function peek(){ return src[i]; }
     function skipWs(){ while (src[i] === ' ') i++; }
     function parseNumber(){
       skipWs();
@@ -230,14 +271,12 @@
   }
 
   function runCalculator(text){
-    // "15% tip on 82.50" / "20% of 340" style
     let m = text.match(/([\d.]+)\s*%\s*(?:tip on|of)\s*([\d.]+)/i);
     if (m) {
       const pct = parseFloat(m[1]), base = parseFloat(m[2]);
       const val = base * (pct / 100);
       return { expr: pct + "% of " + base, value: val, extra: "total with tip: " + (base + val).toFixed(2) };
     }
-    // strip a leading "what is" / "calculate" / trailing "?"
     let expr = text.replace(/^(what'?s|what is|calculate|compute|evaluate)\s+/i, '').replace(/\?+$/,'').trim();
     expr = expr.replace(/x/gi, '*').replace(/×/g,'*').replace(/÷/g,'/');
     const value = evalExpression(expr);
@@ -399,67 +438,8 @@
   }
 
   /* ---------------------------------------------------------
-     Tool 6: planner — goal → checklist
-  --------------------------------------------------------- */
-  const PLAN_TEMPLATES = [
-    { match: /website|portfolio|landing page/i, steps: [
-      "Define the goal and target audience for the site",
-      "Sketch the sitemap and page structure",
-      "Pick a stack and set up hosting/deployment",
-      "Build the core pages, mobile-first",
-      "Write and proofread real content (no placeholder text)",
-      "Test on real devices, fix accessibility issues",
-      "Deploy, then share it for feedback"
-    ]},
-    { match: /learn|study|skill|course/i, steps: [
-      "Write down exactly what 'done' looks like",
-      "Find 1-2 solid resources (course, book, docs)",
-      "Block recurring practice time on the calendar",
-      "Build one small real project with the skill",
-      "Get feedback from someone more experienced",
-      "Teach or write up what you learned to lock it in"
-    ]},
-    { match: /party|event|wedding|trip|travel/i, steps: [
-      "Set the date, budget, and guest/attendee count",
-      "Book the venue or key reservations early",
-      "Draft a timeline for the day",
-      "Handle invitations / bookings",
-      "Confirm details with vendors or venues a week out",
-      "Prepare a day-of checklist so nothing's forgotten"
-    ]},
-    { match: /interview|job|resume|résumé/i, steps: [
-      "Research the company and the specific role",
-      "Tailor your résumé to the job description",
-      "Prepare 3-5 stories using the STAR format",
-      "Practice out loud, ideally with another person",
-      "Prepare thoughtful questions to ask them",
-      "Follow up with a short thank-you note after"
-    ]},
-    { match: /launch|ship|ship it|product|startup|app/i, steps: [
-      "Nail down the smallest useful version (MVP)",
-      "Build it, cutting anything non-essential",
-      "Test it with 3-5 real users before wide release",
-      "Fix the sharpest edges they hit",
-      "Prepare a simple launch announcement",
-      "Ship, then watch usage/feedback closely for a week"
-    ]}
-  ];
-  function runPlanner(text){
-    const goal = text.replace(/^(plan|help me plan|steps to|how do i|how to)\s+/i, '').trim() || text;
-    for (const t of PLAN_TEMPLATES) {
-      if (t.match.test(goal)) return { goal, steps: t.steps };
-    }
-    return { goal, steps: [
-      "Write one sentence defining what success looks like",
-      "List what you already have vs. what's missing",
-      "Break it into the smallest first concrete step",
-      "Do that step today, even imperfectly",
-      "Get feedback, then repeat with the next step"
-    ]};
-  }
-
-  /* ---------------------------------------------------------
-     Intent routing
+     Intent routing — only claims patterns it can answer exactly.
+     Anything else (null) is routed to the real local AI model.
   --------------------------------------------------------- */
   function classify(text){
     const t = text.trim();
@@ -470,32 +450,55 @@
     if (/^[\d\s+\-*/^%().]+$/.test(t) && /\d/.test(t)) return 'calc';
     if (/^(what'?s|what is|calculate|compute|evaluate)\b/i.test(t) && /\d/.test(t)) return 'calc';
     if (/%\s*(tip on|of)/i.test(t)) return 'calc';
-    if (/^plan|help me plan|steps to|how do i|how to/i.test(t)) return 'plan';
-    return 'plan'; // sensible default: treat unmatched free text as a goal to break down
+    return null;
   }
 
   const TOOLS_INFO = [
-    { name:'calculator', desc:'Arithmetic, percentages, tips — "what is 82.5 * 1.18"' },
-    { name:'date_math', desc:'Date differences, add/subtract, weekday lookup' },
-    { name:'unit_convert', desc:'Length, weight, volume, temperature' },
-    { name:'text_tools', desc:'Word count, case conversion, slugify, reverse' },
-    { name:'json_tool', desc:'Validate and pretty-print JSON' },
-    { name:'planner', desc:'Breaks an open-ended goal into concrete steps' }
+    { name:'calculator', desc:'Arithmetic, percentages, tips — "what is 82.5 * 1.18"', ai:false },
+    { name:'date_math', desc:'Date differences, add/subtract, weekday lookup', ai:false },
+    { name:'unit_convert', desc:'Length, weight, volume, temperature', ai:false },
+    { name:'text_tools', desc:'Word count, case conversion, slugify, reverse', ai:false },
+    { name:'json_tool', desc:'Validate and pretty-print JSON', ai:false },
+    { name:'local_ai_chat', desc:'A real open-source model, running in your browser, for anything the tools above can’t handle', ai:true }
   ];
   const EXAMPLES = [
     "convert 12 miles to km",
     "days between 2026-01-01 and 2026-12-25",
     "15% tip on 82.50",
-    "count words in: the quick brown fox jumps",
     "format json: {\"ok\": true, \"n\": 1}",
-    "plan a birthday party"
+    "why is the sky blue?",
+    "help me plan a birthday party"
   ];
+  const AI_SYSTEM_PROMPT = "You are Waypoint, a compact assistant embedded in a developer's personal portfolio site. Be helpful, direct, and concise — 2 to 5 sentences unless the person clearly wants more detail or a list. If someone asks for exact arithmetic, date math, unit conversion, or JSON formatting, remind them those are handled precisely by Waypoint's built-in tools instead (e.g. \"convert 10 miles to km\"), since you may make small mistakes with exact numbers yourself.";
 
+  /* ---------------------------------------------------------
+     Wiring
+  --------------------------------------------------------- */
   const trace = document.getElementById('trace');
   const form = document.getElementById('composer');
   const input = document.getElementById('goalInput');
   const chipsEl = document.getElementById('chips');
   const toolListEl = document.getElementById('toolList');
+  const statusEl = document.getElementById('statusEl');
+  const statusText = document.getElementById('statusText');
+  const aiBanner = document.getElementById('aiBanner');
+  const enableAiBtn = document.getElementById('enableAiBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+
+  let engine = null;
+  let aiReady = false;
+  let aiLoading = false;
+  const webgpuSupported = typeof navigator !== 'undefined' && !!navigator.gpu;
+  const chatHistory = [];
+  const MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+  const WEBLLM_CDN = "https://esm.run/@mlc-ai/web-llm@0.2.84";
+
+  function setStatus(kind, text){
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    statusText.textContent = text;
+  }
 
   function addMsg(role, label, body){
     const div = document.createElement('div');
@@ -507,64 +510,132 @@
     return div;
   }
 
+  async function enableAI(){
+    if (aiLoading || aiReady) return;
+    if (!webgpuSupported) {
+      setStatus('error', 'WebGPU not available in this browser');
+      enableAiBtn.disabled = true;
+      enableAiBtn.textContent = 'Not supported here';
+      return;
+    }
+    aiLoading = true;
+    enableAiBtn.disabled = true;
+    enableAiBtn.textContent = 'Loading…';
+    progressWrap.classList.add('show');
+    setStatus('loading', 'Loading model… 0%');
+    try {
+      const webllm = await import(/* webpackIgnore: true */ WEBLLM_CDN);
+      engine = await webllm.CreateMLCEngine(MODEL_ID, {
+        initProgressCallback: (report) => {
+          const pct = Math.max(0, Math.min(100, Math.round((report.progress || 0) * 100)));
+          progressFill.style.width = pct + '%';
+          progressLabel.textContent = report.text || (pct + '%');
+          setStatus('loading', `Loading model… ${pct}%`);
+        }
+      });
+      aiReady = true;
+      aiLoading = false;
+      aiBanner.classList.add('hidden');
+      setStatus('ready', 'Ready — 5 tools + local AI online');
+      renderToolList();
+    } catch (err) {
+      aiLoading = false;
+      enableAiBtn.disabled = false;
+      enableAiBtn.textContent = 'Retry';
+      progressWrap.classList.remove('show');
+      setStatus('error', 'Model failed to load');
+      console.error(err);
+      addMsg('error', 'Observation — error', "Couldn't load the local AI model: " + (err && err.message ? err.message : err));
+    }
+  }
+
+  async function askAI(text){
+    const obsDiv = addMsg('ai', 'Waypoint AI', '');
+    const bodyEl = obsDiv.querySelector('.body');
+    bodyEl.classList.add('streaming');
+    chatHistory.push({ role: 'user', content: text });
+    const messages = [{ role: 'system', content: AI_SYSTEM_PROMPT }, ...chatHistory.slice(-10)];
+    let reply = '';
+    try {
+      const chunks = await engine.chat.completions.create({ messages, stream: true, temperature: 0.7 });
+      for await (const chunk of chunks) {
+        const delta = chunk.choices && chunk.choices[0] && chunk.choices[0].delta ? (chunk.choices[0].delta.content || '') : '';
+        if (delta) {
+          reply += delta;
+          bodyEl.textContent = reply;
+          trace.scrollTop = trace.scrollHeight;
+        }
+      }
+      chatHistory.push({ role: 'assistant', content: reply });
+    } catch (err) {
+      bodyEl.classList.remove('streaming');
+      obsDiv.className = 'msg error';
+      obsDiv.querySelector('.role').innerHTML = '<span class="dot"></span>Observation — error';
+      bodyEl.textContent = "The local model hit an error: " + (err && err.message ? err.message : err);
+      return;
+    }
+    bodyEl.classList.remove('streaming');
+  }
+
   function handleGoal(text){
     addMsg('goal', 'Goal', text);
     const intent = classify(text);
-    let thought, actionLine, observation, answer, isError = false;
 
-    try {
-      if (intent === 'calc') {
-        thought = "This reads as arithmetic — routing to the calculator tool.";
-        const r = runCalculator(text);
-        actionLine = `calculator("${r.expr}")`;
-        observation = `= ${round(r.value)}` + (r.extra ? `\n${r.extra}` : '');
-        answer = `${r.expr} = ${round(r.value)}` + (r.extra ? ` — ${r.extra}` : '');
-      } else if (intent === 'date') {
-        thought = "This references specific dates — routing to date_math.";
-        const r = runDateMath(text);
-        actionLine = `date_math("${text}")`;
-        observation = r;
-        answer = r;
-      } else if (intent === 'unit') {
-        thought = "This looks like a unit conversion request — routing to unit_convert.";
-        const r = runUnitConvert(text);
-        actionLine = `unit_convert("${text}")`;
-        observation = r.text;
-        answer = r.text;
-      } else if (intent === 'text') {
-        thought = "This is a text-transformation request — routing to text_tools.";
-        const r = runTextTool(text);
-        actionLine = `text_tools("${text}")`;
-        observation = r;
-        answer = r;
-      } else if (intent === 'json') {
-        thought = "Input contains JSON-like structure — routing to json_tool.";
-        const r = runJsonTool(text);
-        actionLine = `json_tool(<payload>)`;
-        observation = r;
-        answer = r.split('\n')[0];
-      } else {
-        thought = "No single-shot tool fits — treating this as an open-ended goal and breaking it into steps.";
-        const r = runPlanner(text);
-        actionLine = `planner("${r.goal}")`;
-        observation = r.steps.map((s,idx) => `${idx+1}. ${s}`).join('\n');
-        answer = `${r.steps.length}-step plan for "${r.goal}" (see above)`;
+    if (intent) {
+      let thought, actionLine, observation, answer, isError = false;
+      try {
+        if (intent === 'calc') {
+          thought = "This reads as arithmetic — routing to the calculator tool.";
+          const r = runCalculator(text);
+          actionLine = `calculator("${r.expr}")`;
+          observation = `= ${round(r.value)}` + (r.extra ? `\n${r.extra}` : '');
+          answer = `${r.expr} = ${round(r.value)}` + (r.extra ? ` — ${r.extra}` : '');
+        } else if (intent === 'date') {
+          thought = "This references specific dates — routing to date_math.";
+          const r = runDateMath(text);
+          actionLine = `date_math("${text}")`;
+          observation = r; answer = r;
+        } else if (intent === 'unit') {
+          thought = "This looks like a unit conversion request — routing to unit_convert.";
+          const r = runUnitConvert(text);
+          actionLine = `unit_convert("${text}")`;
+          observation = r.text; answer = r.text;
+        } else if (intent === 'text') {
+          thought = "This is a text-transformation request — routing to text_tools.";
+          const r = runTextTool(text);
+          actionLine = `text_tools("${text}")`;
+          observation = r; answer = r;
+        } else {
+          thought = "Input contains JSON-like structure — routing to json_tool.";
+          const r = runJsonTool(text);
+          actionLine = `json_tool(<payload>)`;
+          observation = r; answer = r.split('\n')[0];
+        }
+      } catch (e) {
+        isError = true;
+        thought = "Attempted to route this, but the tool couldn't complete it.";
+        actionLine = intent + "(...)";
+        observation = e.message;
       }
-    } catch (e) {
-      isError = true;
-      thought = "Attempted to route this, but the tool couldn't complete it.";
-      actionLine = intent + "(...)";
-      observation = e.message;
-      answer = null;
+      addMsg('thought', 'Thought', thought);
+      addMsg('action', 'Action', actionLine);
+      if (isError) addMsg('error', 'Observation — error', observation);
+      else { addMsg('observation', 'Observation', observation); addMsg('answer', 'Answer', answer); }
+      return;
     }
 
-    addMsg('thought', 'Thought', thought);
-    addMsg('action', 'Action', actionLine);
-    if (isError) {
-      addMsg('error', 'Observation — error', observation);
+    // No deterministic tool matched.
+    if (aiReady) {
+      addMsg('thought', 'Thought', "No built-in tool fits this — asking the local AI model running in your browser.");
+      addMsg('action', 'Action', `local_ai_chat("${text}")`);
+      askAI(text);
+      return;
+    }
+    addMsg('thought', 'Thought', "No built-in tool matches this" + (webgpuSupported ? ", and local AI isn't loaded yet." : "."));
+    if (webgpuSupported) {
+      addMsg('error', 'Observation', 'Click "Enable local AI" above to let me actually answer free-form things like this.');
     } else {
-      addMsg('observation', 'Observation', observation);
-      addMsg('answer', 'Answer', answer);
+      addMsg('error', 'Observation', "This browser doesn't support WebGPU, so free-form AI chat isn't available here — try a recent Chrome or Edge on desktop. The 5 built-in tools above still work fully.");
     }
   }
 
@@ -577,24 +648,37 @@
     input.focus();
   });
 
+  enableAiBtn.addEventListener('click', enableAI);
+
   EXAMPLES.forEach(function(ex){
     const chip = document.createElement('button');
     chip.type = 'button';
-    chip.className = 'chip';
+    chip.className = 'chip' + (classify(ex) ? '' : ' ai-chip');
     chip.textContent = ex;
     chip.addEventListener('click', function(){ input.value = ex; form.dispatchEvent(new Event('submit', {cancelable:true})); });
     chipsEl.appendChild(chip);
   });
 
-  TOOLS_INFO.forEach(function(t){
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="tool-dot"></span><div><div class="tool-name">${t.name}</div><div class="tool-desc">${t.desc}</div></div>`;
-    toolListEl.appendChild(li);
-  });
+  function renderToolList(){
+    toolListEl.innerHTML = '';
+    TOOLS_INFO.forEach(function(t){
+      const li = document.createElement('li');
+      const dotClass = t.ai ? 'tool-dot ai-dot' : 'tool-dot';
+      const status = t.ai ? (aiReady ? ' — loaded' : aiLoading ? ' — loading…' : ' — not loaded') : '';
+      li.innerHTML = `<span class="${dotClass}"></span><div><div class="tool-name">${t.name}${status}</div><div class="tool-desc">${t.desc}</div></div>`;
+      toolListEl.appendChild(li);
+    });
+  }
+  renderToolList();
 
-  addMsg('answer', 'Waypoint', "I'm a small tool-using agent. Give me a goal — I'll decide which tool fits, run it, and show you my reasoning as I go. Try one of the examples below.");
+  if (!webgpuSupported) {
+    enableAiBtn.disabled = true;
+    enableAiBtn.textContent = 'WebGPU unavailable';
+  }
 
-  window.__waypointTest = { runCalculator, runDateMath, runUnitConvert, runTextTool, runJsonTool, runPlanner, classify };
+  addMsg('answer', 'Waypoint', "I'm a tool-using agent. Five things above (math, dates, units, text, JSON) I answer exactly with plain code. Anything else, I hand off to a real small AI model running locally in your browser — click “Enable local AI” above to turn that on. Try one of the examples below.");
+
+  window.__waypointTest = { runCalculator, runDateMath, runUnitConvert, runTextTool, runJsonTool, classify };
 })();
 </script>
 </body>
