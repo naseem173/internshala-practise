@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Strata — Q&amp;A, in layers</title>
+<meta name="description" content="A community Q&A app reimagined with a floating-glass 3D interface — ask, answer, vote, accept." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{ box-sizing:border-box; }
+  :root{
+    --bg-0:#eef1f9;
+    --bg-1:#e2e8f7;
+    --blob-a: 91,108,255;
+    --blob-b: 34,201,201;
+    --blob-c: 255,120,170;
+    --ink:#11131f;
+    --ink-dim:#454a63;
+    --ink-muted:#6b7188;
+    --ink-faint:#8790ab;
+    --glass-bg: rgba(255,255,255,0.56);
+    --glass-bg-strong: rgba(255,255,255,0.74);
+    --glass-border: rgba(255,255,255,0.85);
+    --glass-border-soft: rgba(20,25,50,0.08);
+    --shadow-deep: 0 30px 60px -20px rgba(31,38,82,0.28), 0 10px 20px -10px rgba(31,38,82,0.18);
+    --shadow-soft: 0 14px 30px -14px rgba(31,38,82,0.22);
+    --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4);
+    --accent:#5b57ff;
+    --accent-2:#1fb5b5;
+    --accent-ink:#ffffff;
+    --up:#1fae72;
+    --down:#e6486b;
+    --code-bg: rgba(20,24,48,0.055);
+    --code-ink:#2c2f6b;
+    --ring: rgba(91,87,255,0.35);
+    --font-sans: 'Sora', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg-0:#080a14;
+      --bg-1:#0d1024;
+      --blob-a: 99,109,255;
+      --blob-b: 30,201,190;
+      --blob-c: 255,90,150;
+      --ink:#eef0ff;
+      --ink-dim:#c2c6e6;
+      --ink-muted:#8d92bd;
+      --ink-faint:#666b93;
+      --glass-bg: rgba(255,255,255,0.055);
+      --glass-bg-strong: rgba(255,255,255,0.09);
+      --glass-border: rgba(255,255,255,0.16);
+      --glass-border-soft: rgba(255,255,255,0.08);
+      --shadow-deep: 0 30px 70px -20px rgba(0,0,0,0.65), 0 10px 24px -12px rgba(0,0,0,0.6);
+      --shadow-soft: 0 14px 32px -16px rgba(0,0,0,0.6);
+      --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.05);
+      --accent:#8b90ff;
+      --accent-2:#3fe0d6;
+      --accent-ink:#0b0c1a;
+      --up:#38d98e;
+      --down:#ff6b86;
+      --code-bg: rgba(255,255,255,0.06);
+      --code-ink:#c9ccff;
+      --ring: rgba(139,144,255,0.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg-0:#080a14;
+    --bg-1:#0d1024;
+    --blob-a: 99,109,255;
+    --blob-b: 30,201,190;
+    --blob-c: 255,90,150;
+    --ink:#eef0ff;
+    --ink-dim:#c2c6e6;
+    --ink-muted:#8d92bd;
+    --ink-faint:#666b93;
+    --glass-bg: rgba(255,255,255,0.055);
+    --glass-bg-strong: rgba(255,255,255,0.09);
+    --glass-border: rgba(255,255,255,0.16);
+    --glass-border-soft: rgba(255,255,255,0.08);
+    --shadow-deep: 0 30px 70px -20px rgba(0,0,0,0.65), 0 10px 24px -12px rgba(0,0,0,0.6);
+    --shadow-soft: 0 14px 32px -16px rgba(0,0,0,0.6);
+    --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.05);
+    --accent:#8b90ff;
+    --accent-2:#3fe0d6;
+    --accent-ink:#0b0c1a;
+    --up:#38d98e;
+    --down:#ff6b86;
+    --code-bg: rgba(255,255,255,0.06);
+    --code-ink:#c9ccff;
+    --ring: rgba(139,144,255,0.4);
+  }
+
+  html,body{ height:100%; }
+  body{
+    margin:0; font-family:var(--font-sans); color:var(--ink); background:var(--bg-0);
+    -webkit-font-smoothing:antialiased; min-height:100vh; position:relative; overflow-x:hidden;
+  }
+
+  /* ---------- ambient depth backdrop ---------- */
+  .bg-glow{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+    background:linear-gradient(180deg, var(--bg-0), var(--bg-1)); }
+  .bg-glow i{ position:absolute; border-radius:50%; filter:blur(70px); opacity:0.55; will-change:transform; }
+  .bg-glow i.b1{ width:520px; height:520px; left:-120px; top:-140px; background:radial-gradient(circle at 30% 30%, rgba(var(--blob-a),0.55), transparent 70%); animation:drift1 26s ease-in-out infinite; }
+  .bg-glow i.b2{ width:460px; height:460px; right:-100px; top:120px; background:radial-gradient(circle at 60% 40%, rgba(var(--blob-b),0.4), transparent 70%); animation:drift2 32s ease-in-out infinite; }
+  .bg-glow i.b3{ width:600px; height:600px; left:30%; bottom:-260px; background:radial-gradient(circle at 50% 50%, rgba(var(--blob-c),0.32), transparent 70%); animation:drift3 38s ease-in-out infinite; }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(60px,40px);} }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(-50px,60px);} }
+  @keyframes drift3{ 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(40px,-40px);} }
+  @media (prefers-reduced-motion: reduce){ .bg-glow i{ animation:none !important; } }
+
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:980px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+  ::selection{ background:var(--accent); color:var(--accent-ink); }
+
+  /* ---------- glass primitive ---------- */
+  .glass{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-border-soft);
+    border-radius:20px;
+    backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:var(--shadow-soft), var(--shadow-inset);
+    position:relative;
+  }
+  .glass::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background:linear-gradient(135deg, var(--glass-border), transparent 40%, transparent 60%, var(--glass-border-soft));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; opacity:0.8;
+  }
+  .tilt{ transform-style:preserve-3d; transition:transform 0.5s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s ease; will-change:transform; }
+  .tilt.tilting{ transition:box-shadow 0.4s ease; }
+  .tilt:hover{ box-shadow:var(--shadow-deep), var(--shadow-inset); }
+
+  /* ---------- header ---------- */
+  header{ position:sticky; top:0; z-index:20; padding:14px 0; }
+  header .bar{ display:flex; align-items:center; gap:14px; padding:12px 18px; }
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.15rem; letter-spacing:-0.01em; white-space:nowrap; }
+  .brand .mark{ width:15px; height:15px; border-radius:5px; background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    transform:rotate(45deg) perspective(200px) rotateX(20deg) rotateY(20deg); box-shadow:0 4px 10px -2px rgba(91,87,255,0.55); flex:none; }
+  .brand small{ font-family:var(--font-mono); font-weight:500; color:var(--ink-muted); font-size:0.72rem; letter-spacing:0.02em; }
+  header .search{ flex:1; display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:14px; min-width:0; }
+  header .search input{ flex:1; min-width:0; background:none; border:none; outline:none; color:var(--ink); font-family:var(--font-sans); font-size:0.9rem; }
+  header .search input::placeholder{ color:var(--ink-faint); }
+  header .search svg{ flex:none; opacity:0.6; }
+  .icon-btn{ display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:12px; cursor:pointer; flex:none; border:none; color:var(--ink-dim); }
+  .icon-btn:active{ transform:translateY(1px); }
+  .btn{ font-family:var(--font-sans); font-weight:600; font-size:0.85rem; cursor:pointer; border:none; border-radius:13px; padding:10px 18px;
+    display:inline-flex; align-items:center; gap:8px; white-space:nowrap; transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  .btn:active{ transform:translateY(2px) scale(0.99); }
+  .btn-primary{ background:linear-gradient(160deg, var(--accent), #8d7bff 120%); color:#fff;
+    box-shadow:0 10px 22px -8px rgba(91,87,255,0.55), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-primary:hover{ box-shadow:0 14px 28px -8px rgba(91,87,255,0.65), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .btn-ghost{ background:var(--glass-bg-strong); color:var(--ink-dim); box-shadow:var(--shadow-inset); }
+  .btn-ghost:hover{ color:var(--ink); }
+  .btn-sm{ padding:7px 12px; font-size:0.78rem; border-radius:10px; }
+
+  main{ position:relative; z-index:1; padding:8px 0 90px; }
+  .hero{ padding:34px 0 22px; text-align:center; }
+  .hero h1{ font-size:clamp(1.8rem,4vw,2.6rem); margin:0 0 8px; letter-spacing:-0.02em; }
+  .hero h1 span{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p{ color:var(--ink-muted); max-width:520px; margin:0 auto; font-size:0.95rem; line-height:1.6; }
+  .stats-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:22px; }
+  .stat-pill{ padding:10px 16px; border-radius:13px; font-size:0.78rem; color:var(--ink-dim); display:flex; gap:6px; align-items:baseline; }
+  .stat-pill b{ font-family:var(--font-mono); color:var(--ink); font-size:0.95rem; }
+
+  /* ---------- tag filter row ---------- */
+  .tagbar{ display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 18px; }
+  .tag{ font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.01em; padding:6px 12px; border-radius:9px; color:var(--ink-dim);
+    background:var(--glass-bg-strong); box-shadow:var(--shadow-inset); cursor:pointer; border:1px solid transparent; transition:all 0.15s ease; }
+  .tag:hover{ color:var(--ink); }
+  .tag.active{ color:var(--accent-ink); background:linear-gradient(160deg, var(--accent), #8d7bff 120%); box-shadow:0 8px 16px -6px rgba(91,87,255,0.5); }
+  .sortbar{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .sortbar .seg{ display:flex; gap:4px; padding:4px; border-radius:12px; }
+  .sortbar .seg button{ font-family:var(--font-sans); font-size:0.78rem; font-weight:600; color:var(--ink-muted); background:none; border:none; padding:7px 12px; border-radius:9px; cursor:pointer; }
+  .sortbar .seg button.active{ background:var(--glass-bg-strong); color:var(--ink); box-shadow:var(--shadow-inset); }
+
+  /* ---------- question cards ---------- */
+  .qlist{ display:flex; flex-direction:column; gap:14px; }
+  .qcard{ padding:20px 22px; border-radius:20px; display:flex; gap:18px; cursor:pointer; }
+  .qcard .stats{ display:flex; flex-direction:column; gap:10px; align-items:center; flex:none; width:64px; padding-top:2px; }
+  .qcard .stat{ text-align:center; }
+  .qcard .stat b{ display:block; font-family:var(--font-mono); font-size:1.05rem; }
+  .qcard .stat span{ font-size:0.64rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; }
+  .qcard .stat.votes b{ color:var(--ink); }
+  .qcard .stat.answered b{ color:var(--up); }
+  .qcard .stat.answered.zero b{ color:var(--ink-faint); }
+  .qcard .stat.solved{ padding:4px 8px; border-radius:9px; background:rgba(31,174,114,0.14); }
+  .qcard .body{ flex:1; min-width:0; }
+  .qcard h3{ margin:0 0 6px; font-size:1.08rem; letter-spacing:-0.01em; }
+  .qcard .excerpt{ color:var(--ink-muted); font-size:0.86rem; line-height:1.55; margin:0 0 12px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .qcard .meta-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .qcard .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .qcard .who{ font-size:0.74rem; color:var(--ink-faint); font-family:var(--font-mono); white-space:nowrap; }
+  .qcard .who b{ color:var(--ink-dim); font-weight:600; }
+  .empty{ text-align:center; padding:60px 20px; color:var(--ink-muted); }
+
+  /* ---------- vote controls ---------- */
+  .voter{ display:flex; flex-direction:column; align-items:center; gap:8px; flex:none; width:52px; }
+  .vbtn{ width:42px; height:38px; border-radius:12px; background:var(--glass-bg-strong); border:none; cursor:pointer; color:var(--ink-muted);
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-inset), 0 3px 8px -3px rgba(20,25,50,0.15); transition:all 0.15s ease; }
+  .vbtn:hover{ color:var(--ink); transform:translateY(-1px); }
+  .vbtn:active{ transform:translateY(1px); box-shadow:inset 0 2px 6px rgba(0,0,0,0.2); }
+  .vbtn.up.on{ color:var(--up); box-shadow:0 0 0 1.5px var(--up), 0 6px 14px -4px rgba(31,174,114,0.5); }
+  .vbtn.down.on{ color:var(--down); box-shadow:0 0 0 1.5px var(--down), 0 6px 14px -4px rgba(230,72,107,0.5); }
+  .vcount{ font-family:var(--font-mono); font-weight:700; font-size:1.15rem; }
+  .accept-badge{ margin-top:4px; width:42px; height:34px; border-radius:11px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-faint); background:var(--glass-bg-strong); box-shadow:var(--shadow-inset); }
+  .accept-badge.on{ color:#fff; background:linear-gradient(160deg, var(--up), #37cf8f); box-shadow:0 8px 18px -6px rgba(31,174,114,0.55); }
+
+  /* ---------- question detail ---------- */
+  .qdetail{ padding:26px 26px 24px; border-radius:22px; margin-bottom:22px; display:flex; gap:22px; }
+  .qdetail .content{ flex:1; min-width:0; }
+  .qdetail h2{ font-size:1.5rem; margin:0 0 12px; letter-spacing:-0.01em; }
+  .prose{ color:var(--ink-dim); font-size:0.95rem; line-height:1.7; }
+  .prose p{ margin:0 0 14px; }
+  .prose pre{ background:var(--code-bg); color:var(--code-ink); padding:14px 16px; border-radius:12px; overflow-x:auto; font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; margin:0 0 14px; }
+  .prose code.inline{ background:var(--code-bg); color:var(--code-ink); padding:2px 6px; border-radius:6px; font-family:var(--font-mono); font-size:0.85em; }
+  .back-link{ display:inline-flex; align-items:center; gap:6px; color:var(--ink-muted); font-size:0.85rem; font-weight:600; margin-bottom:16px; cursor:pointer; }
+  .back-link:hover{ color:var(--ink); }
+  .detail-meta{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; }
+
+  .answers-head{ display:flex; align-items:baseline; gap:10px; margin:26px 0 16px; }
+  .answers-head h3{ font-size:1.1rem; margin:0; }
+  .answers-head span{ font-family:var(--font-mono); color:var(--ink-muted); font-size:0.82rem; }
+  .answer{ padding:20px 22px; border-radius:18px; margin-bottom:14px; display:flex; gap:18px; }
+  .answer.accepted{ box-shadow:0 0 0 1.5px rgba(31,174,114,0.55), var(--shadow-soft); }
+  .answer .content{ flex:1; min-width:0; }
+  .accepted-flag{ display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:700; color:var(--up); background:rgba(31,174,114,0.14); padding:4px 10px; border-radius:8px; margin-bottom:10px; }
+  .answer-meta{ margin-top:12px; font-size:0.76rem; color:var(--ink-faint); font-family:var(--font-mono); }
+  .answer-meta b{ color:var(--ink-dim); font-weight:600; }
+
+  /* ---------- forms ---------- */
+  .panel{ padding:28px; border-radius:22px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:0.82rem; font-weight:600; color:var(--ink-dim); margin-bottom:8px; }
+  .field .hint{ font-weight:400; color:var(--ink-faint); font-size:0.76rem; margin-left:6px; }
+  .field input[type=text], .field textarea{
+    width:100%; font-family:var(--font-sans); font-size:0.92rem; color:var(--ink); background:var(--glass-bg-strong);
+    border:1px solid var(--glass-border-soft); border-radius:13px; padding:12px 14px; outline:none; resize:vertical;
+    box-shadow:var(--shadow-inset); transition:box-shadow 0.15s ease;
+  }
+  .field input[type=text]:focus, .field textarea:focus{ box-shadow:var(--shadow-inset), 0 0 0 3px var(--ring); }
+  .field textarea{ min-height:160px; line-height:1.6; font-family:var(--font-mono); font-size:0.85rem; }
+  .tagchips-live{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .tagchips-live span{ font-family:var(--font-mono); font-size:0.7rem; padding:5px 10px; border-radius:8px; background:var(--glass-bg-strong); color:var(--ink-dim); box-shadow:var(--shadow-inset); }
+  .form-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:6px; }
+  .answer-form{ padding:22px; border-radius:18px; margin-top:10px; }
+  .answer-form h4{ margin:0 0 14px; font-size:0.95rem; }
+
+  footer{ position:relative; z-index:1; text-align:center; padding:30px 20px 40px; color:var(--ink-faint); font-size:0.78rem; }
+  footer button{ background:none; border:none; color:var(--accent); font-family:var(--font-sans); font-size:0.78rem; font-weight:600; cursor:pointer; }
+  footer .sep{ opacity:0.4; margin:0 8px; }
+
+  @media (max-width:640px){
+    .brand small{ display:none; }
+    header .bar{ padding:10px 14px; }
+    .qcard{ padding:16px; gap:12px; }
+    .qcard .stats{ width:48px; }
+    .qdetail{ flex-direction:column; padding:20px; }
+    .qdetail .voter{ flex-direction:row; width:auto; }
+    .answer{ flex-direction:column; padding:16px; }
+    .answer .voter{ flex-direction:row; width:auto; }
+    .panel{ padding:20px; }
+  }
+  [hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+
+<header>
+  <div class="wrap glass tilt bar" style="display:flex;">
+    <a class="brand" href="#/" onclick="navigate('list');return false;">
+      <span class="mark"></span> Strata <small>Q&amp;A, in layers</small>
+    </a>
+    <div class="search glass" style="box-shadow:none;background:var(--glass-bg-strong);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Search questions, tags, code…" oninput="onSearch(this.value)" />
+    </div>
+    <button class="icon-btn btn-ghost" title="Toggle theme" onclick="toggleTheme()">
+      <svg id="themeIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <button class="btn btn-primary" onclick="navigate('ask')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      Ask
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== LIST VIEW ===== -->
+  <div id="view-list">
+    <div class="hero">
+      <h1>Questions, <span>answered in layers.</span></h1>
+      <p>A community Q&amp;A board — every card floats a little closer when you look at it. Ask something, answer something, vote on the rest.</p>
+      <div class="stats-row" id="statsRow"></div>
+    </div>
+
+    <div class="tagbar" id="tagBar"></div>
+    <div class="sortbar">
+      <div class="seg glass" id="sortSeg" style="box-shadow:none;background:var(--glass-bg-strong);">
+        <button data-sort="new" class="active" onclick="setSort('new')">Newest</button>
+        <button data-sort="top" onclick="setSort('top')">Top voted</button>
+        <button data-sort="answers" onclick="setSort('answers')">Most answers</button>
+      </div>
+      <span id="resultCount" style="font-size:0.78rem;color:var(--ink-faint);font-family:var(--font-mono);"></span>
+    </div>
+
+    <div class="qlist" id="qlist"></div>
+  </div>
+
+  <!-- ===== ASK VIEW ===== -->
+  <div id="view-ask" hidden>
+    <a class="back-link" onclick="navigate('list');return false;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to questions
+    </a>
+    <div class="panel glass tilt">
+      <h2 style="margin-top:0;">Ask the board</h2>
+      <p style="color:var(--ink-muted);font-size:0.88rem;margin-top:-8px;">Be specific. Include what you tried — code fences (```) render as code blocks.</p>
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="askTitle" placeholder="e.g. Why does my useEffect run twice on mount?" />
+      </div>
+      <div class="field">
+        <label>Body <span class="hint">markdown-ish — wrap code in ``` fences</span></label>
+        <textarea id="askBody" placeholder="What are you trying to do? What have you tried? What happened instead?"></textarea>
+      </div>
+      <div class="field">
+        <label>Tags <span class="hint">comma-separated</span></label>
+        <input type="text" id="askTags" placeholder="javascript, react, hooks" oninput="renderLiveTags()" />
+        <div class="tagchips-live" id="liveTagChips"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="navigate('list')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitQuestion()">Post your question</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUESTION DETAIL VIEW ===== -->
+  <div id="view-question" hidden>
+    <a class="back-link" onclick="navigate('list');return false;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to questions
+    </a>
+    <div id="questionDetail"></div>
+    <div class="answers-head"><h3>Answers</h3><span id="answerCount"></span></div>
+    <div id="answersList"></div>
+    <div class="answer-form glass tilt">
+      <h4>Your answer</h4>
+      <textarea id="answerBody" placeholder="Share what worked — code fences (```) render as code blocks."></textarea>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitAnswer()">Post your answer</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Strata — a portfolio project. All data lives only in your browser.
+  <span class="sep">·</span>
+  <button onclick="resetDemo()">Reset demo data</button>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+var LS_KEY = 'strata_demo_v2';
+var THEME_KEY = 'strata_theme';
+var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------------- seed data ---------------- */
+function iso(hoursAgo){ return new Date(Date.now() - hoursAgo*3600*1000).toISOString(); }
+
+function buildSeed(){
+  var q = [], a = [];
+  function Q(id,title,body,tags,votes,hrs,author,views){
+    q.push({id:id,title:title,body:body,tags:tags,votes:votes,author:author,createdAt:iso(hrs),answerIds:[],acceptedAnswerId:null,views:views}); return id;
+  }
+  function A(id,qid,body,votes,hrs,author){
+    a.push({id:id,questionId:qid,body:body,votes:votes,author:author,createdAt:iso(hrs)});
+    var qq = q.filter(function(x){return x.id===qid;})[0]; qq.answerIds.push(id);
+    return id;
+  }
+
+  var q1 = Q('q1','Why does my React useEffect run twice on mount?',
+    "I have a simple effect:\n\n```\nuseEffect(() => {\n  console.log('mounted');\n}, []);\n```\n\nIt logs twice in development but only once in production. Is this a bug in my code or something else?",
+    ['react','javascript','hooks'], 42, 6, 'arjun.codes', 1180);
+  A('a1',q1,"This is expected in React 18's Strict Mode. React intentionally mounts, unmounts, and remounts components in development to help you find effects that need cleanup. It won't happen in production builds.\n\nIf you need something to run only once even in dev, use a ref guard, but usually the better fix is making the effect idempotent (safe to run twice).",23,5,'devMaria');
+  A('a2',q1,"Adding on to the accepted answer — if you're fetching data, add an AbortController in your cleanup function so the first (throwaway) request gets cancelled instead of racing the second one.",9,4,'kernel_ish');
+  q.filter(function(x){return x.id===q1;})[0].acceptedAnswerId='a1';
+
+  var q2 = Q('q2','Best way to center a div both horizontally and vertically?',
+    "I've tried `margin: auto` with fixed widths and it feels fragile. What's the modern, robust way to center something regardless of content size?",
+    ['css','flexbox'], 128, 30, 'PixelPusher', 3400);
+  A('a3',q2,"```\n.parent {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n```\n\nThis is the most robust option today — it doesn't care about the child's size, and works for one or many children. `grid` with `place-items: center` on the parent is an equally good one-liner if you only need a single child centered.",64,28,'null_pointer');
+  q.filter(function(x){return x.id===q2;})[0].acceptedAnswerId='a3';
+
+  var q3 = Q('q3','git rebase vs git merge — when should I actually use rebase?',
+    "I understand merge creates a merge commit and rebase rewrites history, but I keep breaking shared branches when I rebase. What's the actual rule of thumb?",
+    ['git','version-control'], 76, 50, 'chai_and_code', 2210);
+  A('a4',q3,"The rule that has never failed me: **never rebase a branch other people are also committing to.** Rebase freely on your own local feature branch before opening a PR (to clean up commits), but once it's pushed and shared, merge instead — or use `git pull --rebase` carefully, never `git push --force` on shared branches.",39,47,'recursion_fan');
+  A('a5',q3,"Worth noting: `git merge` preserves true history (what actually happened, including messy commits), while rebase gives you a clean linear story. Some teams value one over the other for that reason alone, independent of the 'shared branch' rule.",11,44,'devMaria');
+
+  var q4 = Q('q4','What does the time complexity of this nested loop actually work out to?',
+    "```\nfor (let i = 0; i < n; i++) {\n  for (let j = i; j < n; j++) {\n    doWork();\n  }\n}\n```\n\nIs this O(n^2) even though the inner loop shrinks each time?",
+    ['algorithms','big-o'], 54, 74, 'recursion_fan', 1590);
+  A('a6',q4,"Yes, still O(n²). The inner loop runs n, then n-1, then n-2 ... down to 1 — that sum is n(n+1)/2, and when you drop constants and lower-order terms for big-O, that's O(n²). The triangular shrink only ever saves you a constant factor of about 2, not an order of magnitude.",31,70,'sql_sorcerer');
+  q.filter(function(x){return x.id===q4;})[0].acceptedAnswerId='a6';
+
+  var q5 = Q('q5','SQL: should I index every column I filter on?',
+    "I have a table with 12 columns and I filter on about 6 of them across different queries. Is it fine to just add an index on all 6?",
+    ['sql','postgresql','performance'], 19, 12, 'sql_sorcerer', 640);
+  A('a7',q5,"Not necessarily — every index speeds up reads but slows down writes and costs storage, so it's a tradeoff, not a free lunch. Start by looking at your actual query patterns: composite indexes that match your most common WHERE + ORDER BY combinations usually beat six separate single-column indexes.",14,10,'arjun.codes');
+
+  var q6 = Q('q6','Difference between let, const and var — is var actually dead?',
+    "I rarely see `var` in modern codebases. Is there any reason to still use it, or is it effectively deprecated?",
+    ['javascript','es6'], 8, 3, 'PixelPusher', 210);
+
+  var q7 = Q('q7','How do I properly handle errors in async/await without try/catch everywhere?',
+    "My code is turning into a wall of `try { } catch (e) { }` blocks. Is there a cleaner pattern for handling async errors across many functions?",
+    ['javascript','async-await','error-handling'], 33, 20, 'kernel_ish', 980);
+  A('a8',q7,"A common pattern is a small wrapper that returns `[error, data]` tuples instead of throwing, so you handle errors with a plain `if` instead of try/catch:\n\n```\nasync function to(promise) {\n  try {\n    const data = await promise;\n    return [null, data];\n  } catch (err) {\n    return [err, null];\n  }\n}\n```\n\nThen `const [err, user] = await to(getUser());` reads a lot flatter than nested try/catch.",21,18,'devMaria');
+
+  var q8 = Q('q8','Python list comprehension vs a for loop — is it actually faster, or just shorter?',
+    "I always assumed comprehensions were 'faster' but never verified it. Is the speed gain real or is it purely a readability thing?",
+    ['python','performance'], 46, 100, 'null_pointer', 2050);
+  A('a9',q8,"It's real, though modest — comprehensions avoid repeated attribute lookups for `.append` and run tighter bytecode internally, so you typically see a 15-30% speedup over an equivalent explicit loop. For anything performance-critical at scale though, reach for something like NumPy vectorization instead — that's an order of magnitude difference, not a percentage one.",27,95,'sql_sorcerer');
+  q.filter(function(x){return x.id===q8;})[0].acceptedAnswerId='a9';
+
+  return { questions:q, answers:a, userVotes:{}, seededAt:Date.now() };
+}
+
+/* ---------------- state ---------------- */
+var state = null;
+function load(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(raw){ state = JSON.parse(raw); if(state && state.questions){ return; } }
+  }catch(e){}
+  state = buildSeed();
+  persist();
+}
+function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function resetDemo(){ localStorage.removeItem(LS_KEY); load(); route(); }
+
+function findQ(id){ return state.questions.filter(function(x){return x.id===id;})[0]; }
+function findA(id){ return state.answers.filter(function(x){return x.id===id;})[0]; }
+function answersFor(qid){ return state.answers.filter(function(x){return x.questionId===qid;}); }
+
+/* ---------------- helpers ---------------- */
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function timeAgo(isoStr){
+  var diff = Math.max(0, Date.now() - new Date(isoStr).getTime());
+  var m = Math.floor(diff/60000);
+  if(m < 1) return 'just now';
+  if(m < 60) return m + (m===1?' min ago':' mins ago');
+  var h = Math.floor(m/60);
+  if(h < 24) return h + (h===1?' hour ago':' hours ago');
+  var d = Math.floor(h/24);
+  if(d < 30) return d + (d===1?' day ago':' days ago');
+  var mo = Math.floor(d/30);
+  return mo + (mo===1?' month ago':' months ago');
+}
+function renderBody(text){
+  var parts = String(text).split('```');
+  var out = '';
+  for(var i=0;i<parts.length;i++){
+    if(i % 2 === 1){
+      out += '<pre><code>' + esc(parts[i].replace(/^\n/,'').replace(/\n$/,'')) + '</code></pre>';
+    } else {
+      var paras = parts[i].split(/\n{2,}/);
+      for(var j=0;j<paras.length;j++){
+        var p = paras[j];
+        if(!p.trim()) continue;
+        var html = esc(p).replace(/\n/g,'<br>');
+        html = html.replace(/`([^`]+)`/g, '<code class="inline">$1</code>');
+        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        out += '<p>' + html + '</p>';
+      }
+    }
+  }
+  return out || '<p></p>';
+}
+function excerpt(text){
+  var plain = String(text).replace(/```[\s\S]*?```/g,' [code] ').replace(/\s+/g,' ').trim();
+  return plain.length > 170 ? plain.slice(0,170) + '…' : plain;
+}
+function allTags(){
+  var set = {}; state.questions.forEach(function(q){ q.tags.forEach(function(t){ set[t]=(set[t]||0)+1; }); });
+  return Object.keys(set).sort(function(a,b){ return set[b]-set[a]; }).map(function(t){ return {tag:t,count:set[t]}; });
+}
+
+/* ---------------- routing ---------------- */
+var routeState = { sort:'new', tag:null, query:'', questionId:null };
+
+function navigate(view, id){
+  if(view==='question'){ location.hash = '#/q/' + id; }
+  else if(view==='ask'){ location.hash = '#/ask'; }
+  else { location.hash = '#/'; }
+}
+
+function route(){
+  var hash = location.hash || '#/';
+  var mQ = hash.match(/^#\/q\/(.+)$/);
+  document.getElementById('view-list').hidden = true;
+  document.getElementById('view-ask').hidden = true;
+  document.getElementById('view-question').hidden = true;
+  if(hash === '#/ask'){
+    document.getElementById('view-ask').hidden = false;
+    attachTiltAll();
+  } else if(mQ){
+    routeState.questionId = mQ[1];
+    document.getElementById('view-question').hidden = false;
+    renderQuestionView(mQ[1]);
+  } else {
+    document.getElementById('view-list').hidden = false;
+    renderList();
+  }
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+}
+
+/* ---------------- rendering: list ---------------- */
+function renderStats(){
+  var qs = state.questions.length, as = state.answers.length;
+  var solved = state.questions.filter(function(q){return q.acceptedAnswerId;}).length;
+  var pct = qs ? Math.round(100*solved/qs) : 0;
+  document.getElementById('statsRow').innerHTML =
+    '<div class="stat-pill glass"><b>'+qs+'</b> questions</div>'+
+    '<div class="stat-pill glass"><b>'+as+'</b> answers</div>'+
+    '<div class="stat-pill glass"><b>'+pct+'%</b> answered</div>';
+}
+
+function renderTagBar(){
+  var tags = allTags();
+  var html = '<span class="tag'+(!routeState.tag?' active':'')+'" onclick="setTag(null)">All</span>';
+  tags.forEach(function(t){
+    html += '<span class="tag'+(routeState.tag===t.tag?' active':'')+'" onclick="setTag(\''+t.tag+'\')">'+esc(t.tag)+' <span style="opacity:.55">'+t.count+'</span></span>';
+  });
+  document.getElementById('tagBar').innerHTML = html;
+}
+
+function setTag(t){ routeState.tag = t; renderList(); }
+function setSort(s){
+  routeState.sort = s;
+  var btns = document.querySelectorAll('#sortSeg button');
+  btns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-sort')===s); });
+  renderList();
+}
+function onSearch(v){ routeState.query = v.trim().toLowerCase(); renderList(); }
+
+function filteredQuestions(){
+  var list = state.questions.slice();
+  if(routeState.tag){ list = list.filter(function(q){ return q.tags.indexOf(routeState.tag) > -1; }); }
+  if(routeState.query){
+    var q = routeState.query;
+    list = list.filter(function(x){
+      return x.title.toLowerCase().indexOf(q) > -1 ||
+             x.body.toLowerCase().indexOf(q) > -1 ||
+             x.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; });
+    });
+  }
+  if(routeState.sort==='new'){ list.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }); }
+  else if(routeState.sort==='top'){ list.sort(function(a,b){ return b.votes-a.votes; }); }
+  else if(routeState.sort==='answers'){ list.sort(function(a,b){ return answersFor(b.id).length - answersFor(a.id).length; }); }
+  return list;
+}
+
+function renderList(){
+  renderStats();
+  renderTagBar();
+  var list = filteredQuestions();
+  document.getElementById('resultCount').textContent = list.length + (list.length===1?' question':' questions');
+  if(!list.length){
+    document.getElementById('qlist').innerHTML = '<div class="empty glass">No questions match that search. <br>Try a different tag or <a href="#" onclick="onSearch(\'\');document.getElementById(\'searchInput\').value=\'\';return false;" style="color:var(--accent);font-weight:600;">clear the filters</a>.</div>';
+    return;
+  }
+  var html = list.map(function(q){
+    var ans = answersFor(q.id);
+    var solved = !!q.acceptedAnswerId;
+    return '<div class="qcard glass tilt" onclick="navigate(\'question\',\''+q.id+'\')">'+
+      '<div class="stats">'+
+        '<div class="stat votes"><b>'+q.votes+'</b><span>votes</span></div>'+
+        '<div class="stat answered'+(ans.length?'':' zero')+(solved?' solved':'')+'">'+
+          '<b>'+ans.length+'</b><span>'+(solved?'✓ solved':'answers')+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="body">'+
+        '<h3>'+esc(q.title)+'</h3>'+
+        '<p class="excerpt">'+esc(excerpt(q.body))+'</p>'+
+        '<div class="meta-row">'+
+          '<div class="tags">'+q.tags.map(function(t){return '<span class="tag" onclick="event.stopPropagation();setTag(\''+t+'\')">'+esc(t)+'</span>';}).join('')+'</div>'+
+          '<div class="who">asked '+timeAgo(q.createdAt)+' by <b>'+esc(q.author)+'</b></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('qlist').innerHTML = html;
+  attachTiltAll();
+}
+
+/* ---------------- rendering: question detail ---------------- */
+function renderQuestionView(qid){
+  var q = findQ(qid);
+  if(!q){ location.hash = '#/'; return; }
+  var myVote = state.userVotes['q-'+q.id] || 0;
+  var accepted = !!q.acceptedAnswerId;
+  document.getElementById('questionDetail').innerHTML =
+    '<div class="qdetail glass tilt">'+
+      '<div class="voter">'+
+        '<button class="vbtn up'+(myVote===1?' on':'')+'" onclick="castVote(\'q\',\''+q.id+'\',1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>'+
+        '<span class="vcount">'+q.votes+'</span>'+
+        '<button class="vbtn down'+(myVote===-1?' on':'')+'" onclick="castVote(\'q\',\''+q.id+'\',-1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>'+
+      '</div>'+
+      '<div class="content">'+
+        '<h2>'+esc(q.title)+'</h2>'+
+        '<div class="prose">'+renderBody(q.body)+'</div>'+
+        '<div class="detail-meta">'+
+          '<div class="tags">'+q.tags.map(function(t){return '<span class="tag" onclick="setTagAndGoList(\''+t+'\')">'+esc(t)+'</span>';}).join('')+'</div>'+
+          '<div class="who" style="font-family:var(--font-mono);font-size:0.76rem;color:var(--ink-faint);">asked '+timeAgo(q.createdAt)+' by <b style="color:var(--ink-dim);">'+esc(q.author)+'</b> · '+(q.views||0)+' views</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  var list = answersFor(q.id).slice().sort(function(a,b){
+    if(a.id===q.acceptedAnswerId) return -1;
+    if(b.id===q.acceptedAnswerId) return 1;
+    return b.votes-a.votes;
+  });
+  document.getElementById('answerCount').textContent = list.length + (list.length===1?' answer':' answers');
+  document.getElementById('answersList').innerHTML = list.map(function(a){
+    var isAcc = a.id===q.acceptedAnswerId;
+    var myAV = state.userVotes['a-'+a.id] || 0;
+    return '<div class="answer glass tilt'+(isAcc?' accepted':'')+'">'+
+      '<div class="voter">'+
+        '<button class="vbtn up'+(myAV===1?' on':'')+'" onclick="castVote(\'a\',\''+a.id+'\',1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>'+
+        '<span class="vcount">'+a.votes+'</span>'+
+        '<button class="vbtn down'+(myAV===-1?' on':'')+'" onclick="castVote(\'a\',\''+a.id+'\',-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>'+
+        '<div class="accept-badge'+(isAcc?' on':'')+'" title="'+(isAcc?'Unmark as accepted':'Mark as accepted')+'" onclick="toggleAccept(\''+q.id+'\',\''+a.id+'\')">'+
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>'+
+        '</div>'+
+      '</div>'+
+      '<div class="content">'+
+        (isAcc ? '<div class="accepted-flag">✓ Accepted answer</div>' : '')+
+        '<div class="prose">'+renderBody(a.body)+'</div>'+
+        '<div class="answer-meta">answered '+timeAgo(a.createdAt)+' by <b>'+esc(a.author)+'</b></div>'+
+      '</div>'+
+    '</div>';
+  }).join('') || '<div class="empty glass">No answers yet — be the first to help.</div>';
+
+  document.getElementById('answerBody').value = '';
+  attachTiltAll();
+}
+
+function setTagAndGoList(t){ routeState.tag = t; location.hash = '#/'; }
+
+/* ---------------- actions ---------------- */
+function castVote(kind, id, dir){
+  var key = kind+'-'+id;
+  var target = kind==='q' ? findQ(id) : findA(id);
+  var cur = state.userVotes[key] || 0;
+  var next = (cur === dir) ? 0 : dir;
+  target.votes += (next - cur);
+  if(next === 0){ delete state.userVotes[key]; } else { state.userVotes[key] = next; }
+  persist();
+  if(kind==='q'){ renderQuestionView(id); } else { renderQuestionView(target.questionId); }
+}
+
+function toggleAccept(qid, aid){
+  var q = findQ(qid);
+  q.acceptedAnswerId = (q.acceptedAnswerId === aid) ? null : aid;
+  persist();
+  renderQuestionView(qid);
+}
+
+function renderLiveTags(){
+  var raw = document.getElementById('askTags').value;
+  var tags = raw.split(',').map(function(t){return t.trim();}).filter(Boolean);
+  document.getElementById('liveTagChips').innerHTML = tags.map(function(t){ return '<span>'+esc(t)+'</span>'; }).join('');
+}
+
+function submitQuestion(){
+  var title = document.getElementById('askTitle').value.trim();
+  var body = document.getElementById('askBody').value.trim();
+  var tagsRaw = document.getElementById('askTags').value.trim();
+  if(!title || !body){
+    flash(document.getElementById('askTitle'));
+    if(!body) flash(document.getElementById('askBody'));
+    return;
+  }
+  var tags = tagsRaw.split(',').map(function(t){return t.trim().toLowerCase();}).filter(Boolean);
+  if(!tags.length) tags = ['general'];
+  var id = 'q' + Date.now();
+  state.questions.unshift({ id:id, title:title, body:body, tags:tags, votes:1, author:'you', createdAt:new Date().toISOString(), answerIds:[], acceptedAnswerId:null, views:1 });
+  state.userVotes['q-'+id] = 1;
+  persist();
+  document.getElementById('askTitle').value='';
+  document.getElementById('askBody').value='';
+  document.getElementById('askTags').value='';
+  renderLiveTags();
+  location.hash = '#/q/' + id;
+}
+
+function submitAnswer(){
+  var qid = routeState.questionId;
+  var body = document.getElementById('answerBody').value.trim();
+  if(!body){ flash(document.getElementById('answerBody')); return; }
+  var id = 'a' + Date.now();
+  state.answers.push({ id:id, questionId:qid, body:body, votes:1, author:'you', createdAt:new Date().toISOString() });
+  findQ(qid).answerIds.push(id);
+  state.userVotes['a-'+id] = 1;
+  persist();
+  renderQuestionView(qid);
+}
+
+function flash(el){
+  el.style.boxShadow = 'var(--shadow-inset), 0 0 0 3px var(--down)';
+  setTimeout(function(){ el.style.boxShadow=''; }, 700);
+  el.focus();
+}
+
+/* ---------------- 3D tilt interaction ---------------- */
+function attachTiltAll(){
+  if(reduceMotion) return;
+  document.querySelectorAll('.tilt').forEach(function(card){
+    if(card.__tiltBound) return;
+    card.__tiltBound = true;
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var px = (e.clientX - r.left)/r.width - 0.5;
+      var py = (e.clientY - r.top)/r.height - 0.5;
+      var max = 6;
+      card.classList.add('tilting');
+      card.style.transform = 'perspective(900px) rotateX('+(-py*max*2)+'deg) rotateY('+(px*max*2)+'deg) translateZ(6px)';
+    });
+    card.addEventListener('mouseleave', function(){
+      card.classList.remove('tilting');
+      card.style.transform = '';
+    });
+  });
+}
+
+/* ---------------- theme ---------------- */
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var effectiveDark = cur ? cur==='dark' : sysDark;
+  var next = effectiveDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+}
+(function initTheme(){
+  try{
+    var saved = localStorage.getItem(THEME_KEY);
+    if(saved) document.documentElement.setAttribute('data-theme', saved);
+  }catch(e){}
+})();
+
+/* ---------------- wire up ---------------- */
+window.navigate = navigate;
+window.setTag = setTag;
+window.setTagAndGoList = setTagAndGoList;
+window.setSort = setSort;
+window.onSearch = onSearch;
+window.castVote = castVote;
+window.toggleAccept = toggleAccept;
+window.submitQuestion = submitQuestion;
+window.submitAnswer = submitAnswer;
+window.renderLiveTags = renderLiveTags;
+window.toggleTheme = toggleTheme;
+window.resetDemo = resetDemo;
+
+window.__strataTest = {
+  getState: function(){ return state; },
+  route: route,
+  seedFresh: function(){ resetDemo(); }
+};
+
+load();
+window.addEventListener('hashchange', route);
+route();
+
+})();
+</script>
+</body>
+</html>
